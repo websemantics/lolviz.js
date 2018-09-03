@@ -1,9 +1,9 @@
 ```
  ╭○──╮  ╭──────╮  ╭○──╮  ╭───╮╭─╮  ╭───╮  ╭──────╮                 ╭───╮  ╭──────╮
- │   │  │  `╭╮ │  │   │  │   ││ │  ├─○─┤  ├────  │  ╭─────────────▶│   │  │ `○───┤
+ │   │  │  `╭╮ │  │   │  │   ││ │  ├─○─┤  ├────  │  ╭─────────────▷│   │  │ `○───┤
  │   │  │   ││ │  │   │  │   ╰╯ │  │   │  │      ┼──╯             ╭╯   │  │      │
  │   │  │   ╰╯ │  │   │  ╰╮    ╭╯  │   │  │ `○───┼╮      ╭○──╮    │    │  ├────  │
- ╰───╯  ╰─○────╯  ╰───╯   ╰───○╯   ╰───╯  ╰──────╯╰─────▶│   │    ╰─○──╯  ╰──────╯
+ ╰───╯  ╰─○────╯  ╰───╯   ╰───○╯   ╰───╯  ╰──────╯╰─────▷│   │    ╰─○──╯  ╰──────╯
                                                          ╰───╯
 ```
 > A small set of functions that display simple data structures and arbitrary object graphs including lists, dictionaries, linked-lists, binary trees and function call stacks (not implemented) in a reasonable manner using [viz.js](https://github.com/mdaines/viz.js/) (graphviz for the web). A Javascript data-structure visualization tool, ported from https://github.com/parrt/lolviz
