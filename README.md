@@ -1,9 +1,9 @@
 ```
- ╭───╮  ╭──▞───╮  ╭───╮  ╭───╮╭─╮  ╭───╮  ╭──────╮         ╭───╮  ╭──────╮
- │   │  │   ╭╮ │  │   │  │   ││ │  ├───┤  ├────  │         │   │  │  ────┤
+ ╭○──╮  ╭──────╮  ╭○──╮  ╭───╮╭─╮  ╭───╮  ╭──────╮         ╭───╮  ╭──────╮
+ │   │  │  `╭╮ │  │   │  │   ││ │  ├─○─┤  ├────  │         │   │  │ `○───┤
  │   │  │   ││ │  │   │  │   ╰╯ │  │   │  │      │        ╭╯   │  │      │
- │   │  │   ╰╯ │  │   │  ╰╮    ╭╯  │   │  │  ────┤  ╭──╮  │    │  ├────  │
- ╰───╯  ╰──────╯  ╰───╯   ╰────╯   ╰───╯  ╰──────╯  ╰──╯  ╰────╯  ╰──────╯
+ │   │  │   ╰╯ │  │   │  ╰╮    ╭╯  │   │  │ `○───┤  ╭─▞╮  │    │  ├────  │
+ ╰───╯  ╰─○────╯  ╰───╯   ╰───○╯   ╰───╯  ╰──────╯  ╰──╯  ╰─○──╯  ╰──────╯
 ```
 
 > A small set of functions that display simple data structures and arbitrary object graphs including lists, dictionaries, linked-lists, binary trees and function call stacks (not implemented) in a reasonable manner using [viz.js](https://github.com/mdaines/viz.js/) (graphviz for the web). A Javascript data-structure visualization tool, ported from https://github.com/parrt/lolviz
@@ -39,7 +39,7 @@ This was achieved by making few tweaks to the original code to accumodate change
 
 Here's an example of the three styles that can be achived (fancy, b&w and classic),
 
-<img src="images/appearance.png" width=800>
+<img src="images/appearance.png" width=850>
 
 ## Support
 
