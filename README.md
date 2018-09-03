@@ -31,6 +31,8 @@ Mapping of types between Javascript and Python is tricky (huh, who knew!) and it
 
 This implementation includes an implementation to visualize Tensors (Scalar, Vector, Matrix etc).
 
+<img src="images/tensor.png" width=850>
+
 ## Appearance
 
 I've made an attempt in this project to make few style changes to graphviz generated SVG images to enhance the visualization apperance.
