@@ -1,5 +1,5 @@
 /**
- * SVG helper functions.
+ * SVG helper library to create/manipulate SVG DOM elements.
  *
  * @version 1.0.0
  * @copyright (c) 2016-2018, Web Semantics, Inc.

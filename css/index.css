@@ -1,0 +1,81 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f1f1f1;
+  color: #5a5d72;
+  font-family: proxima-nova, 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  line-height: 1.75;
+  margin: 0;
+  padding: 100px;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: #1ba1e2;
+  text-decoration: none;
+}
+
+/* Navbar styles */
+
+.navbar {
+  background-color: #fff;
+  border-bottom: 1px solid #cfcfcf;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
+  display: flex;
+  align-items: center;
+  padding: 10px 100px;
+}
+
+.navbar > * {
+  margin: 0;
+}
+
+.navbar .push {
+  margin-left: auto;
+}
+
+.navbar input[type='checkbox'] {
+  display: none;
+}
+
+.navbar label {
+  align-items: center;
+  background-color: #f1f1f1;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  margin-left: 5px;
+  width: 32px;
+}
+
+.navbar label:hover {
+  background-color: #eee;
+}
+
+.navbar input:checked + label[for='paintcan'] {
+  color: #1ba1e2;
+}
+
+.navbar input:checked + label[for='flame'] {
+  color: #ff8e00;
+}
+
+/* Digraph styles */
+
+.digraph {
+  align-items: center;
+  display: flex;
+}
+
+.digraph > * {
+  margin-right: 150px;
+}

@@ -19,8 +19,8 @@ render(objviz(hlist))`
     title: 'Mixed layout',
     description: 'Display a list of lists using object graph visualization',
     code: `const table = [
-['Date', 'Open', 'High', 'Low', 'Close', 'Volume'],
-['2016-08-12', 107.779999, 108.440002, 107.779999, 108.18, 18612300, 108.18]
+  ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'],
+  ['2016-08-12', 107.779999, 108.440002, 107.779999, 108.18, 18612300, 108.18]
 ]
 
 render(objviz(table))`
@@ -61,10 +61,10 @@ render(objviz(longly))`
     title: 'Linked-list layout',
     description: 'Display a simple linked-list',
     code: `class Node {
-constructor(value, next = null) {
-this.value = value
-this.next = next
-}
+  constructor(value, next = null) {
+    this.value = value
+    this.next = next
+  }
 }
 
 let head = new Node('tombu')
@@ -77,10 +77,10 @@ render(objviz(head))`
     title: 'List of objects',
     description: 'Display a list of individual linked-list nodes',
     code: `class Node {
-constructor(value, next = null) {
-this.value = value
-this.next = next
-}
+  constructor(value, next = null) {
+    this.value = value
+    this.next = next
+  }
 }
 
 const a = [new Node('parrt'), new Node('mary')]

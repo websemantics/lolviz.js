@@ -1,0 +1,32 @@
+/* Tiny highlight highlight styles */
+
+.highlight {
+  background-color: #fafafa;
+  border: 1px solid #cfcfcf;
+  border-radius: 3px;
+  color: #333;
+  display: block;
+  margin: 20px 0 30px 0;
+  padding: 15px;
+}
+
+.highlight .keyword {
+  color: #005cc5;
+}
+
+.highlight .operator {
+  color: #a3a2a2;
+}
+
+.highlight .quote,
+.highlight .quote .value {
+  color: #ba2121;
+}
+
+.highlight .value {
+  color: #080;
+}
+
+.highlight .comment {
+  color: #aaa;
+}

@@ -1,31 +1,18 @@
 /**
- * Faithful (albeit optomized) port of List of Lists Visualization library
- * (lolviz) from Python to Javascript.
+ * A faithful (albeit optimized and incomplete) port of Terence Parr List of Lists Visualization
+ * library 1.4, https://github.com/parrt/lolviz from Python to Javascript
  *
- * A small set of functions that display simple data structures and arbitrary
- * object graphs including lists, dictionaries, linked lists, binary trees and
- * function call stacks in a reasonable manner using graphviz.
- *
- * #### Note:
- *
- * This implementation makes the following assumptions,
- *
- * - 'Map' and 'Set' are sufficient replacement for Python 'dict' and 'tuple'
- *   types respectively.
- */
-
-/**
- * Python Collections (Arrays):
- *
- * - List       : Ordered and changeable collection (Allows duplicate)
- * - Tuple      : Ordered and unchangeable collection (Allows duplicate)
- * - Set        : Unordered and unindexed collection (No duplicates)
- * - Dictionary : Unordered, changeable and indexed collection (No duplicates)
+ * @version 1.0.0
+ * @see https://github.com/websemantics/lolviz.js
+ * @author Adnan M.Sagar, PhD. <adnan@websemantics.ca>
+ * @license Distributed under the terms of the MIT License.
  */
 
 import { id, type, ctor, len, escape, repr, str, hasattr, list, chunk } from './support/python.js'
 
-/* Preferences */
+/**
+ * Preferences.
+ */
 const prefs = {
   /* style properties */
   penwidth: 0.5,
@@ -41,11 +28,9 @@ const prefs = {
   max_list_elems: 10
 }
 
-/* Make changes to preferences */
-export const config = (key, value) => (prefs[key] = value)
-
-/* Helpers */
-
+/**
+ * Helper functions/classes.
+ */
 const nodename = v => `node${id(v)}`
 
 const digraph = (body, o = {}) => {
@@ -55,7 +40,9 @@ const digraph = (body, o = {}) => {
 
   return `digraph G {
     ${attrs}
-    node [penwidth="${prefs.penwidth}", shape=box, width=.1, height=.1, color="${prefs.color_black}"];
+    node [penwidth="${prefs.penwidth}", shape=box, width=.1, height=.1, color="${
+  prefs.color_black
+}"];
     ${body}
   }`
 }
@@ -74,6 +61,14 @@ class Ellipsis {
     return '...'
   }
 }
+
+/**
+ * Make changes to preferences.
+ *
+ * @param {string} key
+ * @param {string|number} value
+ */
+export const config = (key, value) => (prefs[key] = value)
 
 /**
  * Show a string like an array.
@@ -161,7 +156,10 @@ export function lolviz(table, { showassoc = true, shape = [], showindexes = !sha
   const nodes = table.map(sublist =>
     gr_list_node(nodename(sublist), sublist, { showindexes, shape }))
 
-  const links = table.map((sublist, i) => `${nodename(table)}:${str(i)} -> ${nodename(sublist)}:w [arrowtail=dot, penwidth="0.5", color="${prefs.color_black}", arrowsize=.4, weight=100]\n`)
+  const links = table.map((sublist, i) =>
+    `${nodename(table)}:${str(i)} -> ${nodename(sublist)}:w [arrowtail=dot, penwidth="0.5", color="${
+      prefs.color_black
+    }", arrowsize=.4, weight=100]\n`)
 
   const gb = `${vlist}${nodes.join('')}${links.join('')}`
 
@@ -190,6 +188,8 @@ export function callviz(varnames = null, frame = null) {
  * parameters. You can limit the variables displayed by passing in a list of
  * `varnames` as an argument.
  *
+ * ~ NOT IMPLMENTED ~
+ *
  * @param {*} varnames
  * @param {*} callstack
  */
@@ -197,7 +197,6 @@ function callsviz(varnames = null, callstack = null) {
   const gb = ''
   return digraph(gb, { nodesep: 0.1, ranksep: 0.1, rankdir: 'LR' })
 
-  console.log(varnames, callstack)
   // /* Get stack frame nodes so we can stack 'em up */
   // if (callstack === null) {
   //   stack = inspect.stack()
@@ -325,7 +324,7 @@ function obj_node(p, varnames = null) {
     //            bgcolor=prefs.color_blue,
     //                         separator=None, reprkey=False)
   } else if (type(p) === 'dict') {
-    //       # print "DRAW DICT", p, '@ node' + nodename
+    /* print "DRAW DICT", p, '@ node' + nodename */
     const items = Object.entries(p)
       // if varnames is not None and k not in varnames: continue
       .filter(([k, v]) => !(varnames !== null && !varnames.includes(k)))
@@ -386,7 +385,7 @@ function obj_node(p, varnames = null) {
 }
 
 function obj_edges(nodes, varnames = null) {
-  /* edges start at right edge not center for vertical lists */
+  /* Edges start at right edge not center for vertical lists */
   const es = edges(nodes, varnames).map(([p, label, q]) =>
     Array.isArray(p) && !isatomlist(p)
       ? `${nodename(p)}:${label} -> ${nodename(q)}:w [arrowtail=dot, penwidth="0.5", color="${
@@ -426,10 +425,12 @@ function gr_list_node(
 ) {
   const node_shape = elems.length > 0 ? 'box' : 'none'
 
-  let html = `<font face="Times-Italic" color="${prefs.color_black}" point-size="9">empty list</font>`
+  let html = `<font face="Times-Italic" color="${
+    prefs.color_black
+  }" point-size="9">empty list</font>`
 
   if (elems.length > 0) {
-    /* compute just to see eventual size */
+    /* Compute just to see eventual size */
     const abbrev_values = abbrev_and_escape_values(elems)
 
     if (len(abbrev_values.join('')) <= prefs.max_horiz_array_len || len(shape) > 0) {
@@ -542,7 +543,7 @@ function gr_dict_html(
   const atoms = items.filter(it => isatom(it[2]))
 
   if (items.length > 0) {
-    /* do atoms first then ptrs */
+    /* Do atoms first then ptrs */
     atoms.concat(ptrs).forEach(([label, key, value]) => {
       const font = highlight && key in highlight ? 'Times-Italic' : 'Helvetica'
 
@@ -812,7 +813,9 @@ function string_html(s) {
       last ? '' : 'r'
     }" valign="top"><font color="${prefs.color_black}" point-size="9">${d}</font></td>\n`
   const value_html = (d, s, last) =>
-    `<td port="${d}" cellspacing="0" cellpadding="0" bgcolor="${prefs.color_yellow}" border="0" align="center"><font face="Monaco" point-size="11">${s}</font></td>\n`
+    `<td port="${d}" cellspacing="0" cellpadding="0" bgcolor="${
+      prefs.color_yellow
+    }" border="0" align="center"><font face="Monaco" point-size="11">${s}</font></td>\n`
 
   const toprow = values.map((v, i) => index_html(i, i === values.length - 1))
   const bottomrow = values.map((v, i) => value_html(i, v, i === values.length - 1))
@@ -983,7 +986,7 @@ function connected_subgraphs(reachable, varnames = null) {
       const q = e[2]
 
       if (ctor(p) === ctor(q)) {
-        /* ensure that singly-linked nodes use same field */
+        /* Ensure that singly-linked nodes use same field */
         // const cname = ctor(p)
 
         // if (max_edges_for_type[cname] === 1 && cname in type_fieldname_map) {

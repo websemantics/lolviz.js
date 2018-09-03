@@ -1,6 +1,6 @@
 /**
  * Approximal implementations of some of [Python built-in functions]
- * (https://docs.python.org/2/library/functions.html) and a few extras.
+ * (https://docs.python.org/2/library/functions.html) and few extra helpers.
  *
  * #### API
  *

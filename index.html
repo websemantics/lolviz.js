@@ -3,90 +3,11 @@
 
 <head>
   <meta charset="utf-8">
-  <title>List of Lists Visualization</title>
+  <title>Javascript List of Lists Visualization</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/highlight.css">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      padding: 80px;
-      margin: 0;
-      background-color: #f0efef;
-      color: #5a5d72;
-      font-family: proxima-nova, proxima-nova-all, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-weight: 400;
-      line-height: 1.75;
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    nav {
-      background-color: #fff;
-      border-bottom: 1px solid #cfcfcf;
-      left: 0;
-      position: fixed;
-      top: 0;
-      width: 100vw;
-      box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
-      display: flex;
-      align-items: center;
-      padding: 10px 80px;
-    }
-
-    nav>* {
-      margin: 0;
-    }
-
-    a {
-      color: #1ba1e2;
-      text-decoration: none;
-    }
-
-    pre {
-      background-color: #fafafa;
-      border: 1px solid #cfcfcf;
-      display: block;
-      border-radius: 3px;
-      padding: 15px;
-      margin: 20px 0 30px 0;
-      color: #333;
-    }
-
-    input[type="checkbox"] {
-      display: none;
-    }
-
-    input+label {
-      /* color: #a7a7a7; */
-      width: 32px;
-      height: 32px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-flow: column;
-      border-radius: 3px;
-      background-color: #f1f1f1;
-      margin-left: 5px;
-    }
-
-    .digraph {
-      display: flex;
-      align-items: center;
-    }
-
-    .digraph > * {
-      margin-right: 40px;
-    }
-
-
-    input:checked+label[for="paintcan"] {
-      color: #1ba1e2;
-    }
-
-    input:checked+label[for="flame"] {
-      color: #ff8e00;
-    }
+    /* Style SVG graph/node elements */
 
     .graph polygon:first-of-type {
       fill: none;
@@ -95,32 +16,11 @@
     /* .graph g.node polygon:first-of-type {
       fill: #fefecd;
     } */
-
-    pre .keyword {
-      color: #005cc5;
-    }
-
-    pre .operator {
-      color: #a3a2a2;
-    }
-
-    pre .quote,
-    pre .quote .number {
-      color: #ba2121;
-    }
-
-    pre .number, pre .comment {
-      color: #080;
-    }
-
-    .push {
-      margin-left: auto;
-    }
   </style>
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg bg-primary">
+  <nav class="navbar">
     <h2><a href="https://github.com/websemantics/lolviz.js">Lolviz<b style="color:#ff8e00; margin: 0 3px;">.</b>js</a></h2>
     <div class="push"></div>
     <input type="checkbox" id="paintcan" name="paintcan" checked="checked">
@@ -140,6 +40,7 @@
     import Viz from './lib/viz.js/viz.es.js';
     import { fancy } from './src/support/fancy.js';
     import { examples } from './src/examples.js';
+    import { highlight } from './src/support/highlight.js';
 
     const viz = new Viz({ workerURL: './lib/viz.js/full.render.js' });
 
@@ -158,29 +59,21 @@
 
       const create = (tag, parent) => parent.appendChild(document.createElement(tag))
 
-      function highlight(code) {
-        code = code.replace(new RegExp(`(['"])(.*?)['"]`, 'g'), '<span class="quote">$1$2$1</span>')
-        code = code.replace(new RegExp(`([0-9]+\.?[0-9]*)`, 'g'), '<span class="number">$1</span>')
-        code = code.replace(new RegExp(`(const|new|let|class) `, 'gm'), '<span class="keyword">$1 </span>')
-        code = code.replace(new RegExp(`([,()\\[\\]{}])`, 'gm'), '<span class="operator">$1</span>')
-        code = code.replace(new RegExp(`\/\\*(.*)\\*\/`, 'gm'), '<span class="comment">/*$1*/</span>')
-
-        return code
-      }
-
       const a = /!(.?)/
       /* Render examples */
-      examples.forEach(ex => {
+      examples.forEach(example => {
         const parent = create('div', content)
-        create('h3', parent).innerHTML = ex.title
-        create('p', parent).innerHTML = ex.description
+        create('h3', parent).innerHTML = example.title
+        create('p', parent).innerHTML = example.description
         const digraph = create('div', parent)
         digraph.setAttribute('class', 'digraph')
-        create('pre', parent).innerHTML = highlight(ex.code)
+        const pre = create('pre', parent)
+        pre.innerHTML = highlight(example.code)
+        pre.setAttribute('class', 'highlight')
 
-        const render = (g) =>  viz.renderSVGElement(g).then(el => digraph.appendChild(flame.checked ? fancy(el) : el))
+        const render = (g) => viz.renderSVGElement(g).then(el => digraph.appendChild(flame.checked ? fancy(el) : el))
 
-        eval(ex.code)
+        eval(example.code)
       })
     }
 
