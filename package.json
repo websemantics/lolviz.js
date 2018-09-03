@@ -1,0 +1,27 @@
+{
+  "name": "lolviz.js",
+  "version": "1.0.0",
+  "description": "A faithful (albeit optimized) port of Terence Parr List of Lists Visualization library, https://github.com/parrt/lolviz from Python to Javascript.",
+  "main": "src/lolviz.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/websemantics/lolviz.js.git"
+  },
+  "keywords": [
+    "visualization",
+    "graphviz",
+    "data-structures"
+  ],
+  "author": "Adnan M.Sagar, PhD.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/websemantics/lolviz.js/issues"
+  },
+  "homepage": "https://github.com/websemantics/lolviz.js#readme"
+}

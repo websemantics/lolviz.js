@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>List of Lists Visualization Classic</title>
+  <style>
+    body {
+      display: flex;
+      flex-flow: column;
+      justify-content: center;
+    }
+
+    svg {
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="module">
+    import { ord, chr, array, range, len } from './src/support/python.js'
+    import { listviz, lolviz, objviz, strviz, treeviz, callviz } from './src/lolviz.js';
+    import Viz from './lib/viz.js/viz.es.js';
+
+    const viz = new Viz({ workerURL: './lib/viz.js/full.render.js' });
+
+    /* Render funnction */
+
+    const render = g => viz.renderSVGElement(g).then(el => document.body.appendChild(el))
+
+    /* Support classes */
+
+    class Node {
+      constructor(value, next = null) {
+        this.value = value
+        this.next = next
+      }
+    }
+
+    class Tree {
+      constructor(value, left = null, right = null) {
+        this.value = value
+        this.left = left
+        this.right = right
+      }
+    }
+
+    class Tensor {
+      constructor(shape, values) {
+        this.shape = shape
+        this.values = values
+      }
+    }
+
+    /* Examples from https://github.com/parrt/lolviz */
+
+    const vlist = ['2016-08-12', 107.779999, 108.440002, 107.779999, 108.18]
+    render(objviz(vlist))
+
+    const table = [
+      ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'],
+      ['2016-08-12', 107.779999, 108.440002, 107.779999, 108.18, 18612300, 108.18]
+    ]
+    render(objviz(table))
+
+    const items = d => Array.from(d).reduce((set, [k, v]) => set.add(new Set([k, v])), new Set())
+    const d = range(ord('a'), ord('h'), i => ([i, chr(i)])).reduce((dict, [k, v]) => dict.set(k, v), new Map())
+    render(listviz(d))
+    render(objviz(d))
+    const tuplelist = items(d)
+    render(listviz(tuplelist))
+    render(objviz(tuplelist))
+
+    const mom = ['hi', 'mom']
+    render(objviz(mom))
+
+    const suser = new Map(Object.entries({ 'superuser': true, 'mgr': false }))
+    render(objviz(suser))
+
+    const longly = range(0, 20, i => (`elem${i}`))
+
+    /* Long set shown vertically */
+    render(objviz(longly))
+
+    let head = new Node('tombu')
+    head = new Node('parrt', head)
+    head = new Node("xue", head)
+    render(objviz(head))
+
+    const a = [new Node('parrt'), new Node('mary')]
+    render(objviz(a))
+
+    const head2 = ['parrt', new Set(['mary', null])]
+    render(objviz(head2))
+
+    /* Incorrect list of list init */
+    const empty = []
+    const data = array(5).map(() => empty)
+    render(lolviz(data))
+
+    /* whoops! should be different list object */
+    data[0].push(['a', 4])
+    data[2].push(['b', 9])
+    render(lolviz(data))
+
+    /* Correct way to init */
+    const table2 = array(5).map(() => [])
+    render(lolviz(table2))
+
+    const key = 'a'
+    const value = 99
+    /* Assume keys are single-element strings */
+    const hashcode = (o) => ord(o)
+    const bucket_index = hashcode(key) % len(table)
+    const bucket = table[bucket_index]
+    /* Add association to the bucket */
+    bucket.push([key, value])
+    render(lolviz(table))
+    render(objviz(table))
+
+    const courses = [['msan501', 51], ['msan502', 32], ['msan692', 101]]
+    render(objviz(courses))
+
+    const newyork = 'New York'
+    render(strviz(newyork))
+
+    const root = new Tree('parrt',
+      new Tree('mary',
+        new Tree('jim',
+          new Tree('srinivasan'),
+          new Tree('april'))),
+      new Tree('xue', null, new Tree('mike')))
+    render(treeviz(root))
+
+    /* Tensor related examples */
+
+    const t0 = new Tensor([1], [42])
+    const t1 = new Tensor([5], [1, 2, 3, 4, 5])
+    const t2 = new Tensor([4, 4], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+    const t3 = new Tensor([3, 3, 3], [11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19])
+
+    render(lolviz(t0.values, { shape: t0.shape }))
+    render(lolviz(t1.values, { shape: t1.shape }))
+    render(lolviz(t2.values, { shape: t2.shape }))
+    render(lolviz(t3.values, { shape: t3.shape }))
+
+    /* Work in progress ... might never see the light of day */
+
+    // const N = 100
+
+    // function f(x) {
+    //   const a = ['hi', 'mom']
+    //   const thestack = lolviz([[], [], [], [], []])
+    //   // const thestack = callsviz(varnames = ['table', 'x', 'head', 'courses', 'N', 'a'])
+    //   viz.renderSVGElement(thestack).then(element => document.body.appendChild(element))
+
+    //   console.log(JSON.stringify(arguments))
+    // }
+
+    // f(99)
+
+    // function send(type, message){
+    //   console.log(`Sending ${type} => "${message}"`)
+    // }
+
+    // function callsviz(fn, ...args){
+    //   const names = `${fn}`.match(/function\s.*\((.*?)\)/)[1].split(',')
+    //   console.log(names)
+    //   fn.apply(window, args)
+    // }
+
+    // callsviz(send, 'Email', 'Hello Dear!')
+  </script>
+
+</body>
+
+</html>
