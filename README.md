@@ -25,7 +25,7 @@ A reminder of the definitions of few Python collections (arrays),
 * `Set`        : Unordered and unindexed collection (No duplicates)
 * `Dictionary` : Unordered, changeable and indexed collection (No duplicates)
 
-Mapping of types between Javascript and Python is tricky (huh, who knew!) and it's likely that there're better ways to do that. So, please feel free to send comments and suggestions.
+Mapping of types between Javascript and Python is tricky (huh, who knew!) and it's likely that there're better ways to do that. So, please feel free to send comments and suggestions for how to improve.
 
 ## Tensors
 
