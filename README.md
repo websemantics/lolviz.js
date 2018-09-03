@@ -20,10 +20,10 @@ This implementation makes the assumption that Javascript `Map` and `Set` types a
 
 A reminder of the definitions of few Python collections (arrays),
 
-* List       : Ordered and changeable collection (Allows duplicate)
-* Tuple      : Ordered and unchangeable collection (Allows duplicate)
-* Set        : Unordered and unindexed collection (No duplicates)
-* Dictionary : Unordered, changeable and indexed collection (No duplicates)
+* `List`       : Ordered and changeable collection (Allows duplicate)
+* `Tuple`      : Ordered and unchangeable collection (Allows duplicate)
+* `Set`        : Unordered and unindexed collection (No duplicates)
+* `Dictionary` : Unordered, changeable and indexed collection (No duplicates)
 
 Mapping of types between Javascript and Python is tricky (huh, who knew!) and it's likely that there're better ways to do that. So, please feel free to send comments and suggestions.
 
@@ -51,30 +51,30 @@ Included in this project the following support libraries,
 
 Approximal implementations of some of [Python built-in functions](https://docs.python.org/2/library/functions.html) and a few extra helpers.
 
-* id         : Generate an id
-* escape     : Escape HTML entities
-* stringify  : Enhanced JSON.stringify function
-* repr       : Get a printable representation of an object
-* str        : Get a nicely printable representation of an object
-* hasattr    : Check if an object’s contains a specific attribute
-* isinstance : Check if an object is an instance of provided type
-* list       : Convert a 'set', 'map' or an object to keys array
-* ord        : Get the char code of the first character of a string
-* chr        : Get the character of a char code
-* array      : Get an empty array for the given size
-* range      : Iterate over the given range (from, to)
-* flat       : A variant of 'str' function
-* chunk      : Split an array into chunks
-* len        : Get variable size (set, map, array or object)
+* `id`         : Generate an id
+* `escape`     : Escape HTML entities
+* `stringify`  : Enhanced JSON.stringify function
+* `repr`       : Get a printable representation of an object
+* `str`        : Get a nicely printable representation of an object
+* `hasattr`    : Check if an object’s contains a specific attribute
+* `isinstance` : Check if an object is an instance of provided type
+* `list`       : Convert a 'set', 'map' or an object to keys array
+* `ord`        : Get the char code of the first character of a string
+* `chr`        : Get the character of a char code
+* `array`      : Get an empty array for the given size
+* `range`      : Iterate over the given range (from, to)
+* `flat`       : A variant of 'str' function
+* `chunk`      : Split an array into chunks
+* `len`        : Get variable size (set, map, array or object)
 
 #### Type.js
 
 A tiny libary to work with Javascript types including a built-in support for ducktyping.
 
-* type : Return variable type as a string
-* is   : Check for a variable type
-* as   : Check for a variable ducktype
-* ctor : Get a variable class name
+* `type` : Return variable type as a string
+* `is`   : Check for a variable type
+* `as`   : Check for a variable ducktype
+* `ctor` : Get a variable class name
 
 #### SVG.js
 
