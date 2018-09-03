@@ -14,18 +14,18 @@ For more information please check the [original project page](https://github.com
 
 Also, see [examples](https://websemantics.github.io/lolviz.js/examples.html)
 
-## Python Collections
+## Assumption
 
-Quick reminder of few Python collections (arrays) mainly for myself,
+This implementation makes the assumption that Javascript `Map` and `Set` types are sufficient replacement for Python `dict` and `tuple` types respectively.
+
+A reminder of the definitions of few Python collections (arrays),
 
 * List       : Ordered and changeable collection (Allows duplicate)
 * Tuple      : Ordered and unchangeable collection (Allows duplicate)
 * Set        : Unordered and unindexed collection (No duplicates)
 * Dictionary : Unordered, changeable and indexed collection (No duplicates)
 
-#### Note:
-
-This implementation makes the assumption that Javascript `Map` and `Set` types are sufficient replacement for Python `dict` and `tuple` types respectively.
+Mapping of types between Javascript and Python is tricky and it's likelt that I might have not done a striking job at it, so please feel free to comment and or suggest enhancement of how that was done.
 
 ## Tensors
 
