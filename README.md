@@ -58,7 +58,7 @@ Approximal implementations of some of [Python built-in functions](https://docs.p
 * `str`        : Get a nicely printable representation of an object
 * `hasattr`    : Check if an object’s contains a specific attribute
 * `isinstance` : Check if an object is an instance of provided type
-* `list`       : Convert a 'set', 'map' or an object to keys array
+* `list`       : Convert a `Set`, `Map` or an object instance to an array of keys
 * `ord`        : Get the char code of the first character of a string
 * `chr`        : Get the character of a char code
 * `array`      : Get an empty array for the given size
