@@ -1,6 +1,6 @@
 /**
  * A faithful (albeit optimized and incomplete) port of Terence Parr List of Lists Visualization
- * library 1.4, https://github.com/parrt/lolviz from Python to Javascript
+ * library 1.3.3, https://github.com/parrt/lolviz from Python to Javascript
  *
  * @version 1.0.0
  * @see https://github.com/websemantics/lolviz.js
