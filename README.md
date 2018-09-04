@@ -29,7 +29,7 @@ Also, here's a quick reminder of few Python collections (arrays) that have been 
 
 ## Appearance
 
-There was an attempt in this project to make few style changes to graphviz generated SVG images in order to enhance the their apperance.
+There was an attempt in this project to make few style changes to graphviz generated SVG images in order to enhance their apperance.
 
 Here's an example of the three styles that can be displayed (fancy, b&w and classic),
 
