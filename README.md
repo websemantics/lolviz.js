@@ -45,7 +45,7 @@ Addmitedly, what comes next is not exactly inline with the initial premise of th
 
 #### Tensors
 
-This feature visualizes Tensors with different sizes/ranks like scalars, vectors, matrixies or any rank `n` Tensor (up to rank 3 for the timebeing).
+This feature visualizes Tensors with different sizes/ranks like scalars, vectors, matrices or any rank `n` Tensor (up to rank 3 for the timebeing).
 
 <img src="assets/img/tensor.png" width=850>
 
