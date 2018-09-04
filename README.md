@@ -41,7 +41,7 @@ Also, check out [this reference page](https://websemantics.github.io/lolviz.js/a
 
 ## New Features
 
-Addmitedly, what comes next is not exactly inline with the initial primise of the lolviz library but they were included in this project regadless because, 1. They can be useful tools, 2. They produce cool visualizations, and 3. why not?
+Addmitedly, what comes next is not exactly inline with the initial premise of the lolviz library but they were included in this project regadless because, 1. They can be useful tools, 2. They produce cool visualizations, and 3. why not?
 
 #### Tensors
 
