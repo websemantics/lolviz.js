@@ -6,42 +6,58 @@
  ╰───╯  ╰─○────╯  ╰───╯   ╰───○╯   ╰───╯  ╰──────╯╰─────▷│   │    ╰─○──╯  ╰──────╯
                                                          ╰───╯
 ```
-> A small set of functions that display simple data structures and arbitrary object graphs including lists, dictionaries, linked-lists, binary trees and function call stacks (not implemented) in a reasonable manner using [viz.js](https://github.com/mdaines/viz.js/) (graphviz for the web). A Javascript data-structure visualization tool, ported from https://github.com/parrt/lolviz
+> A small set of functions that display simple data structures and arbitrary object graphs including lists, dictionaries, linked-lists, binary trees, class hierarchies and function call stacks (not implemented) in a reasonable manner using [viz.js](https://github.com/mdaines/viz.js/) (graphviz for the web). A Javascript data-structure visualization tool, ported from https://github.com/parrt/lolviz
 
 For more information please check the [original project page](https://github.com/parrt/lolviz)
 
 [![Live demo](https://img.shields.io/badge/Live%20demo-%E2%86%92-9D6EB3.svg?style=flat-square)](https://websemantics.github.io/lolviz.js)
 
-Also, see [examples](https://websemantics.github.io/lolviz.js/examples.html)
+Also, see [examples](https://websemantics.github.io/lolviz.js/assets/demo/examples.html)
 
 ## Assumptions
 
 This implementation makes the assumption that Javascript `Map` and `Set` types are sufficient replacement for Python `dict` and `tuple` types respectively.
 
-A reminder of the definitions of few Python collections (arrays),
+Mapping of data types between Javascript and Python is tricky (huh, who knew!) and it's likely that there're better ways to do that. Feel free to send comments and suggestions for how to improve.
+
+Also, here's a quick reminder of few Python collections (arrays) that have been used in lolviz,
 
 * `List`       : Ordered and changeable collection (Allows duplicate)
 * `Tuple`      : Ordered and unchangeable collection (Allows duplicate)
 * `Set`        : Unordered and unindexed collection (No duplicates)
 * `Dictionary` : Unordered, changeable and indexed collection (No duplicates)
 
-Mapping of types between Javascript and Python is tricky (huh, who knew!) and it's likely that there're better ways to do that. So, please feel free to send comments and suggestions for how to improve.
-
-## Tensors
-
-This implementation includes an implementation to visualize Tensors (Scalar, Vector, Matrix and `n` rank Tensor).
-
-<img src="img/tensor.png" width=850>
-
 ## Appearance
 
-I've made an attempt in this project to make few style changes to graphviz generated SVG images to enhance the visualization apperance.
+There was an attempt in this project to make few style changes to graphviz generated SVG images in order to enhance the their apperance.
 
-This was achieved by making few tweaks to the original code to accumodate changes to color and style (line thickness for example) in addition to making direct changes to the SVG DOM of the generated images.
+Here's an example of the three styles that can be displayed (fancy, b&w and classic),
 
-Here's an example of the three styles that can be achived (fancy, b&w and classic),
+<img src="assets/img/appearance.png" width=850>
 
-<img src="img/appearance.png" width=850>
+This was achieved by making few tweaks to the original code to accumodate run-time changes to color and style (line thickness for example) in addition to making direct changes to the SVG DOM of the generated images.
+
+Also, check out [this reference](https://websemantics.github.io/lolviz.js/assets/demo/graphviz.html) for more examples of how to write/tweak graphviz dot graphs.
+
+## New Features
+
+Addmitedly, what comes next is not exactly inline with the initial primise of the lolviz library but they were included in this project regadless because, 1. They can be useful tools, 2. They produce cool visualizations, and 3. why not?
+
+#### Tensors
+
+This feature visualizes Tensors with different sizes/ranks like scalars, vectors, matrixies or any rank `n` Tensor (up to rank 3 for the timebeing).
+
+<img src="assets/img/tensor.png" width=850>
+
+Check out this [example](https://websemantics.github.io/lolviz.js/assets/demo/tensor.html)
+
+#### Class Hierarchy
+
+This feature is useful when you have a collection of related objects and want to visualize their internal structure and their class hierarchy that ties them together.
+
+<img src="assets/img/reflect.png" width=850>
+
+Check out this [example](https://websemantics.github.io/lolviz.js/assets/demo/reflect.html)
 
 ## Libraries
 
@@ -76,6 +92,15 @@ A tiny libary to work with Javascript types including a built-in support for duc
 * `as`   : Check for a variable ducktype
 * `ctor` : Get a variable class name
 
+#### Reflect.js
+
+Inspect objects for their internal structure including,
+
+* Class name and class hierarchy (parent classes)
+* Member properties and their data types (static and public)
+* Member methods, their arguments (static and public)
+* Arguments data types and default values if any.
+
 #### SVG.js
 
 SVG helper library to create/manipulate SVG DOM elements.
@@ -86,7 +111,7 @@ Custom DOM-Stylier for the SVG images generated by Viz.js.
 
 #### Highlight.js
 
-Super tiny Javascript code highlighter for the demo page.
+Super tiny generic code highlighter for the demo page.
 
 ## Support
 

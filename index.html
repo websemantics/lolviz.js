@@ -4,18 +4,13 @@
 <head>
   <meta charset="utf-8">
   <title>Javascript List of Lists Visualization</title>
-  <link rel="stylesheet" href="css/index.css">
-  <link rel="stylesheet" href="css/highlight.css">
+  <link rel="stylesheet" href="assets/css/index.css">
+  <link rel="stylesheet" href="assets/css/highlight.css">
   <style>
-    /* Style SVG graph/node elements */
-
-    .graph polygon:first-of-type {
+    /* Remove the graph default white background */
+    .graph > polygon:first-of-type {
       fill: none;
     }
-
-    /* .graph g.node polygon:first-of-type {
-      fill: #fefecd;
-    } */
   </style>
 </head>
 
@@ -36,13 +31,13 @@
 
   <script type="module">
     import { ord, chr, array, range, len } from './src/support/python.js'
-    import { config, listviz, lolviz, objviz, strviz, treeviz, callviz } from './src/lolviz.js';
-    import Viz from './lib/viz.js/viz.es.js';
+    import { config, listviz, lolviz, objviz, strviz, treeviz, callviz, classviz } from './src/lolviz.js';
+    import Viz from './assets/lib/viz.js/viz.es.js';
     import { fancy } from './src/support/fancy.js';
     import { examples } from './src/examples.js';
     import { highlight } from './src/support/highlight.js';
 
-    const viz = new Viz({ workerURL: './lib/viz.js/full.render.js' });
+    const viz = new Viz({ workerURL: './assets/lib/viz.js/full.render.js' });
 
     paintcan.onchange = evt => paint()
     flame.onchange = evt => paint()

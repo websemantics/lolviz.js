@@ -248,5 +248,48 @@ render(lolviz(large.values, { shape: large.shape }))`
 const tensor = new Tensor([3, 3, 3], [11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39])
 
 render(lolviz(tensor.values, { shape: tensor.shape }))`
+  },
+  {
+    title: 'Class hierarchy layout',
+    description: 'Display the class hierarchy of releated objects',
+    code: `class Point {
+  constructor(x = 1, y) {
+    this.x = x;
+    this.y = y;
+  }
+  static distance(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+
+    return Math.hypot(dx, dy);
+  }
+}
+
+Point.origin = 0 /* Static property */
+
+class Shape {
+  constructor() {
+  }
+}
+
+class Rectangle extends Shape {
+  constructor(height, width) {
+    super()
+    this.height = height;
+    this.width = width;
+  }
+  get area() {
+    return this.calcArea();
+  }
+  calcArea() {
+    return this.height * this.width;
+  }
+}
+
+const point = new Point(5, 5)
+const shape = new Shape()
+const square = new Rectangle(10, 10)
+
+render(classviz(shape, point, square))`
   }
 ]

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Tensor Visualization</title>
+	<link rel="stylesheet" href="../css/index.css">
+	<link rel="stylesheet" href="../css/highlight.css">
+	<style>
+		body {
+			background-color: #fff;
+			padding: 0 40px;
+		}
+
+		h3 {
+			margin-top: 40px;
+		}
+	</style>
+</head>
+
+<body>
+	<h3>Tensor Visualization</h3>
+	<p>Scallar, Vector, Matrix and Rank 3 Tensor</p>
+	<div class="digraph"></div>
+	<script type="module">
+		import { reflect, print } from '../../src/support/reflect.js';
+		import { highlight } from '../../src/support/highlight.js';
+		import { lolviz, config } from '../../src/lolviz.js';
+		import Viz from '../lib/viz.js/viz.es.js';
+
+		const viz = new Viz({ workerURL: '../lib/viz.js/full.render.js' });
+
+		config('class_name_suffix', 'Class')
+
+		const render = g => viz.renderSVGElement(g).then(el => document.querySelector('.digraph').appendChild(el))
+
+
+		class Tensor {
+			constructor(shape, values) {
+				this.shape = shape
+				this.values = values
+			}
+		}
+
+		const t0 = new Tensor([1], [42])
+		const t1 = new Tensor([5], [1, 2, 3, 4, 5])
+		const t2 = new Tensor([4, 4], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+		const t3 = new Tensor([3, 3, 3], [11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19])
+
+		render(lolviz(t0.values, { shape: t0.shape }))
+		render(lolviz(t1.values, { shape: t1.shape }))
+		render(lolviz(t2.values, { shape: t2.shape }))
+		render(lolviz(t3.values, { shape: t3.shape }))
+
+	</script>
+</body>
+
+</html>

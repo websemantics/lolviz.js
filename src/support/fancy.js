@@ -47,18 +47,17 @@ export function fancy(el) {
     const polygons = node.querySelectorAll('polygon')
 
     if (!polygons[0]) return
-    // console.log(polygons[0])
 
-    /* 2.1. Get fill color from other than the first polygon */
-    const { fill } = attrs(polygons[1], ['fill'])
-
-    /* 2.2. Parse first polygon points attribute and extract x,y, width and height */
+    /* 2.1. Parse first polygon points attribute and extract x,y, width and height */
     const [x1, y1, x2, y2] = attr(polygons[0], 'points')
       .split(' ')
       .map(p => p.split(',').map(v => parseFloat(v)))
       .reduce(([xa, ya, xb, yb], [x, y]) => [min(xa, x), min(ya, y), max(xb, x), max(yb, y)], xy)
 
     const polygonAttrs = attrs(polygons[0], ['fill', 'stroke', 'stroke-width'])
+
+    /* 2.2. Get fill color from other than the first polygon */
+    const { fill } = polygons[1] ? attrs(polygons[1], ['fill']) : polygonAttrs
 
     const rectAttrs = {
       x: x1,

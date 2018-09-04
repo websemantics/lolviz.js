@@ -77,5 +77,3 @@ export const len = (v) => {
   if (type(v) === 'set' || type(v) === 'map') return v.size
   return Object.keys(v).length
 }
-
-export { type, ctor }

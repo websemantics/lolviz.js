@@ -3,27 +3,35 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Javascript List of Lists Visualization Examples (classic)</title>
+  <title>Javascript List of Lists Visualization Examples</title>
+  <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="../css/highlight.css">
   <style>
     body {
+      background-color: #fff;
+      padding: 0 40px;
       display: flex;
       flex-flow: column;
       justify-content: center;
     }
 
+    h3 {
+      margin-top: 40px;
+    }
+
     svg {
-      padding: 20px;
+      margin: 20px;
     }
   </style>
 </head>
-
 <body>
-  <script type="module">
-    import { ord, chr, array, range, len } from './src/support/python.js'
-    import { listviz, lolviz, objviz, strviz, treeviz, callviz } from './src/lolviz.js';
-    import Viz from './lib/viz.js/viz.es.js';
+    <h3>Javascript List of Lists Visualization Examples (classic)</h3>
+    <script type="module">
+    import { ord, chr, array, range, len } from '../../src/support/python.js'
+    import { listviz, lolviz, objviz, strviz, treeviz, callviz } from '../../src/lolviz.js';
+    import Viz from '../lib/viz.js/viz.es.js';
 
-    const viz = new Viz({ workerURL: './lib/viz.js/full.render.js' });
+    const viz = new Viz({ workerURL: '../lib/viz.js/full.render.js' });
 
     /* Render funnction */
 
@@ -43,13 +51,6 @@
         this.value = value
         this.left = left
         this.right = right
-      }
-    }
-
-    class Tensor {
-      constructor(shape, values) {
-        this.shape = shape
-        this.values = values
       }
     }
 
@@ -133,19 +134,9 @@
       new Tree('xue', null, new Tree('mike')))
     render(treeviz(root))
 
-    /* Tensor related examples */
-
-    const t0 = new Tensor([1], [42])
-    const t1 = new Tensor([5], [1, 2, 3, 4, 5])
-    const t2 = new Tensor([4, 4], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-    const t3 = new Tensor([3, 3, 3], [11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19])
-
-    render(lolviz(t0.values, { shape: t0.shape }))
-    render(lolviz(t1.values, { shape: t1.shape }))
-    render(lolviz(t2.values, { shape: t2.shape }))
-    render(lolviz(t3.values, { shape: t3.shape }))
-
+    /* ===================================================== */
     /* Work in progress ... might never see the light of day */
+    /* ===================================================== */
 
     // const N = 100
 

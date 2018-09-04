@@ -1,0 +1,594 @@
+<html lang="en" dir="ltr">
+
+<head>
+	<title>Graphviz</title>
+	<link rel="stylesheet" href="../css/index.css">
+	<link rel="stylesheet" href="../css/highlight.css">
+	<style>
+		body {
+			background-color: #fff;
+			padding: 40px;
+		}
+
+		pre {
+			display: block;
+			border: 1px solid #cccccc;
+			background-color: #fafafa;
+			padding: 10px;
+		}
+	</style>
+</head>
+
+<body>
+	<h3>Graphviz</h3>
+	<p>A collection of Graphviz (dot) examples from
+		<a href="https://renenyffenegger.ch/notes/tools/Graphviz/examples/index">renenyffenegger notes</a> inculed mainly as an
+		implmentation reference.
+	</p>
+	<script type="module">
+		import { escape } from '../../src/support/python.js';
+		import Viz from '../lib/viz.js/viz.es.js';
+		const viz = new Viz({ workerURL: '../lib/viz.js/full.render.js' });
+
+		const examples = [
+			{
+				title: 'Dotted edges etc',
+				description: '',
+				graph: `digraph D {
+
+A [shape=diamond]
+B [shape=box]
+C [shape=circle]
+
+A -> B [style=dashed, color=grey]
+A -> C [color="black:invis:black"]
+A -> D [penwidth=5, arrowhead=none]
+
+}`
+			},
+			{
+				title: 'Shape: record vs. plaintext',
+				description: 'If the shape attribute is set to record, the text of the label is layouted in tabular form. The vertical bar ( |) starts a new row or column. The curly braces { ... } change (flip) the direction of |.',
+				graph: `digraph D {
+
+node [fontname="Arial"];
+
+node_A [shape=record    label="shape=record|{above|middle|below}|right"];
+node_B [shape=plaintext label="shape=plaintext|{curly|braces and|bars without}|effect"];
+
+
+}`
+			},
+			{
+				title: 'Multiple edges',
+				description: 'Normally, a dependency (an edge) is declared with an arrow: Node1 -> Node2. Multiple nodes can be listed in curly braces, thus declaring multple edges in one go',
+				graph: `digraph D {
+
+A -> {B, C, D} -> {F}
+
+}`
+			},
+			{
+				title: 'Left, mid and right aligned text',
+				description: '\l makes the preceeding text right aligned, \n makes it centered and \r makes it left aligned',
+				graph: `digraph L {
+
+node [shape=record fontname=Arial];
+
+a  [label="one\\ltwo three\\lfour five six seven\\l"]
+b  [label="one\\ntwo three\\nfour five six seven"]
+c  [label="one\\rtwo three\\rfour five six seven\\r"]
+
+a -> b -> c
+
+}`
+			},
+			{
+				title: 'Giving the graph a caption',
+				description: 'With label, the graph can be given a caption:',
+				graph: `digraph D {
+
+label = "The foo, the bar and the baz";
+labelloc = "t"; // place the labe at the top (b seems to be default)
+
+node [shape=plaintext]
+
+FOO -> {BAR, BAZ};
+
+}`
+			},
+			{
+				title: 'HTML like labels',
+				description: 'If the text of label is enclosed in <…> rather than in "…", the text is treated as HTML:',
+				graph: `digraph D {
+
+label = <The <font color='red'><b>foo</b></font>,<br/> the <font point-size='20'>bar</font> and<br/> the <i>baz</i>>;
+labelloc = "t"; // place the label at the top (b seems to be default)
+
+node [shape=plaintext]
+
+FOO -> {BAR, BAZ};
+
+}`
+			},
+			{
+				title: 'rank',
+				description: '{ rank=same node_1 node_2 … } specifies that the specified nodes have the same rank, that is, that their diestance from the top or left border is equal.',
+				graph: `digraph R {
+
+node [shape=record];
+
+{ rank=same rA sA tA }
+{ rank=same uB vB wB }
+
+
+//  rA -> sA;
+//  sA -> vB;
+//  t  -> rA;
+//  uB -> vB;
+//  wB -> u;
+//  wB -> tA;
+
+}`
+			},
+			{
+				title: 'Subgraph (clusters)',
+				description: '',
+				graph: `digraph Q {
+
+node [shape=record];
+
+nd_1   [label = "Node 1"];
+nd_2   [label = "Node 2"];
+nd_3_a [label = "Above Right Node 3"];
+nd_3_l [label = "Left of Node 3"];
+nd_3   [label = "Node 3"];
+nd_3_r [label = "Right of Node 3"];
+nd_4   [label = "Node 4"];
+
+
+// nd_3_a -> nd_3_r;
+// nd_1 -> nd_2 -> nd_3 -> nd_4;
+
+// subgraph cluster_R {
+
+// 	{rank=same nd_3_l nd_3 nd_3_r}
+
+// 	nd_3_l -> nd_3 -> nd_3_r [color=grey arrowhead=none];
+
+// }
+
+}`
+			},
+			{
+				title: 'Nested clusters',
+				description: '',
+				graph: `digraph D {
+
+subgraph cluster_p {
+	label = "Parent";
+
+	subgraph cluster_c1 {
+		label = "Child one";
+		a;
+
+		subgraph cluster_gc_1 {
+			label = "Grand-Child one";
+			 b;
+		}
+		subgraph cluster_gc_2 {
+			label = "Grand-Child two";
+				c;
+				d;
+		}
+
+	}
+
+	subgraph cluster_c2 {
+		label = "Child two";
+		e;
+	}
+}
+} `
+			},
+			{
+				title: 'HTML tables are produced if the value of the label attribute is enclosed in <…> rather than "…":',
+				description: '',
+				graph: `digraph H {
+
+aHtmlTable [
+ shape=plaintext
+ color=blue      // The color of the border of the table
+ label=<
+
+	 <table border='1' cellborder='0'>
+		 <tr><td>col 1</td><td>foo</td></tr>
+		 <tr><td>COL 2</td><td>bar</td></tr>
+	 </table>
+
+>];
+
+}
+`
+			},
+			{
+				title: 'Nested HTML table',
+				description: 'HTML tables can be nested',
+				graph: `digraph {
+
+tbl [
+
+	shape=plaintext
+	label=<
+
+		<table border='0' cellborder='1' color='blue' cellspacing='0'>
+			<tr><td>foo</td><td>bar</td><td>baz</td></tr>
+			<tr><td cellpadding='4'>
+				<table color='orange' cellspacing='0'>
+					<tr><td>one  </td><td>two  </td><td>three</td></tr>
+					<tr><td>four </td><td>five </td><td>six  </td></tr>
+					<tr><td>seven</td><td>eight</td><td>nine </td></tr>
+				</table>
+			</td>
+			<td colspan='2' rowspan='2'>
+				<table color='pink' border='0' cellborder='1' cellpadding='10' cellspacing='0'>
+					<tr><td>eins</td><td>zwei</td><td rowspan='2'>drei<br/>sechs</td></tr>
+					<tr><td>vier</td><td>fünf</td>                             </tr>
+				</table>
+			</td>
+			</tr>
+
+			<tr><td>abc</td></tr>
+
+		</table>
+
+	>];
+
+}
+`
+			},
+			{
+				title: 'Colors',
+				description: '',
+				graph: `
+digraph D {
+
+  node [shape=plaintext]
+
+  some_node [
+   label=<
+     <table border="0" cellborder="1" cellspacing="0">
+       <tr><td bgcolor="yellow">Foo</td></tr>
+       <tr><td bgcolor="lightblue"><font color="#0000ff">Bar</font></td></tr>
+       <tr><td bgcolor="#f0e3ff"><font color="#ff1020">Baz</font></td></tr>
+     </table>>
+  ];
+ }`
+			},
+			{
+				title: 'Rounded box',
+				description: '',
+				graph: `digraph H {
+
+aHtmlTable [
+ shape=plaintext
+ label=<
+
+	 <table border='1' cellborder='0' style='rounded'>
+		 <tr><td>col 1</td><td>foo</td></tr>
+		 <tr><td>COL 2</td><td>bar</td></tr>
+	 </table>
+
+>];
+
+}`
+			},
+			{
+				title: 'Ports',
+				description: '',
+				graph: `digraph H {
+
+parent [
+ shape=plaintext
+ label=<
+	 <table border='1' cellborder='1'>
+		 <tr><td colspan="3">The foo, the bar and the baz</td></tr>
+		 <tr><td port='port_one'>First port</td><td port='port_two'>Second port</td><td port='port_three'>Third port</td></tr>
+	 </table>
+>];
+
+child_one [
+ shape=plaintext
+ label=<
+	 <table border='1' cellborder='0'>
+		 <tr><td>1</td></tr>
+	 </table>
+>];
+
+child_two [
+ shape=plaintext
+ label=<
+	 <table border='1' cellborder='0'>
+		 <tr><td>2</td></tr>
+	 </table>
+>];
+
+child_three [
+ shape=plaintext
+ label=<
+	 <table border='1' cellborder='0'>
+		 <tr><td>3</td></tr>
+	 </table>
+>];
+
+parent:port_one   -> child_one;
+parent:port_two   -> child_two;
+parent:port_three -> child_three;
+
+}`
+			},
+			{
+				title: 'Project Dependencies',
+				description: '',
+				graph: `digraph D {
+
+node [shape=plaintext fontname="Sans serif" fontsize="8"];
+
+task_menu [ label=<
+ <table border="1" cellborder="0" cellspacing="1">
+	 <tr><td align="left"><b>Task 1</b></td></tr>
+	 <tr><td align="left">Choose Menu</td></tr>
+	 <tr><td align="left"><font color="darkgreen">done</font></td></tr>
+ </table>>];
+
+task_ingredients [ label=<
+ <table border="1" cellborder="0" cellspacing="1">
+	 <tr><td align="left"><b>Task 2</b></td></tr>
+	 <tr><td align="left">Buy ingredients</td></tr>
+	 <tr><td align="left"><font color="darkgreen">done</font></td></tr>
+ </table>>];
+
+task_invitation [ label=<
+ <table border="1" cellborder="0" cellspacing="1">
+	 <tr><td align="left"><b>Task 4</b></td></tr>
+	 <tr><td align="left">Send invitation</td></tr>
+	 <tr><td align="left"><font color="darkgreen">done</font></td></tr>
+ </table>>];
+
+task_cook [ label=<
+ <table border="1" cellborder="0" cellspacing="1">
+	 <tr><td align="left"><b>Task 5</b></td></tr>
+	 <tr><td align="left">Cook</td></tr>
+	 <tr><td align="left"><font color="red">todo</font></td></tr>
+ </table>>];
+
+task_table[ label=<
+ <table border="1" cellborder="0" cellspacing="1">
+	 <tr><td align="left"><b>Task 3</b></td></tr>
+	 <tr><td align="left">Lay table</td></tr>
+	 <tr><td align="left"><font color="red">todo</font></td></tr>
+ </table>>];
+
+task_eat[ label=<
+ <table border="1" cellborder="0" cellspacing="1">
+	 <tr><td align="left"><b>Task 6</b></td></tr>
+	 <tr><td align="left">Eat</td></tr>
+	 <tr><td align="left"><font color="red">todo</font></td></tr>
+ </table>>];
+
+
+task_menu        -> task_ingredients;
+task_ingredients -> task_cook;
+task_invitation  -> task_cook;
+task_table       -> task_eat;
+task_cook        -> task_eat;
+
+}`
+			},
+			{
+				title: 'Edges that are crossing',
+				description: '',
+				graph: `digraph G {
+
+node [shape=plaintext fontname="Arial"];
+
+0  [label="zero"      ];
+1  [label="one"       ];
+2  [label="two"       ];
+3  [label="three"     ];
+4  [label="four"      ];
+5  [label="five"      ];
+6  [label="six"       ];
+7  [label="seven"     ];
+8  [label="eight"     ];
+9  [label="nine"      ];
+10 [label="ten"       ];
+11 [label="eleven"    ];
+12 [label="twelve"    ];
+13 [label="thirteen"  ];
+14 [label="fourteen"  ];
+15 [label="fivteen"   ];
+16 [label="sixteen"   ];
+17 [label="seventeen" ];
+18 [label="eighteen"  ];
+19 [label="nineteen"  ];
+20 [label="twenty"    ];
+21 [label="twenty-one"];
+22 [label="twenty-two"];
+
+0  -> 1  [arrowhead=none];
+1  -> 2  [arrowhead=none];
+2  -> 7  [arrowhead=none];
+7  -> 8  [arrowhead=none];
+8  -> 9  [arrowhead=none];
+8  -> 10 [arrowhead=none];
+9  -> 10 [color="#aaaaaa" constraint=false];
+10 -> 11 [arrowhead=none];
+10 -> 12 [arrowhead=none];
+11 -> 12 [color="#aaaaaa" constraint=false];
+7  -> 13 [arrowhead=none];
+8  -> 13 [color="#aaaaaa" constraint=false];
+13 -> 14 [arrowhead=none];
+7  -> 15 [arrowhead=none];
+13 -> 15 [color="#aaaaaa" constraint=false];
+15 -> 16 [arrowhead=none];
+15 -> 17 [arrowhead=none];
+16 -> 17 [color="#aaaaaa" constraint=false];
+2  -> 3  [arrowhead=none];
+7  -> 3  [color="#aaaaaa" constraint=false];
+3  -> 4  [arrowhead=none];
+2  -> 5  [arrowhead=none];
+3  -> 5  [color="#aaaaaa" constraint=false];
+5  -> 6  [arrowhead=none];
+2  -> 18 [arrowhead=none];
+5  -> 18 [color="#aaaaaa" constraint=false];
+18 -> 19 [arrowhead=none];
+19 -> 20 [arrowhead=none];
+19 -> 21 [arrowhead=none];
+20 -> 21 [color="#aaaaaa" constraint=false];
+18 -> 22 [arrowhead=none];
+19 -> 22 [color="#aaaaaa" constraint=false];
+}`
+			},
+			{
+				title: 'Edges that are not crossing',
+				description: '',
+				graph: `digraph G {
+
+node [shape=plaintext fontname="Arial"];
+
+0  -> 1  [arrowhead=none];
+1  -> 2  [arrowhead=none];
+2  -> 7  [arrowhead=none];
+7  -> 8  [arrowhead=none];
+8  -> 9  [arrowhead=none];
+8  -> 10 [arrowhead=none];
+9  -> 10 [color="#aaaaaa" constraint=false];
+10 -> 11 [arrowhead=none];
+10 -> 12 [arrowhead=none];
+11 -> 12 [color="#aaaaaa" constraint=false];
+7  -> 13 [arrowhead=none];
+8  -> 13 [color="#aaaaaa" constraint=false];
+13 -> 14 [arrowhead=none];
+7  -> 15 [arrowhead=none];
+13 -> 15 [color="#aaaaaa" constraint=false];
+15 -> 16 [arrowhead=none];
+15 -> 17 [arrowhead=none];
+16 -> 17 [color="#aaaaaa" constraint=false];
+2  -> 3  [arrowhead=none];
+7  -> 3  [color="#aaaaaa" constraint=false];
+3  -> 4  [arrowhead=none];
+2  -> 5  [arrowhead=none];
+3  -> 5  [color="#aaaaaa" constraint=false];
+5  -> 6  [arrowhead=none];
+2  -> 18 [arrowhead=none];
+5  -> 18 [color="#aaaaaa" constraint=false];
+18 -> 19 [arrowhead=none];
+19 -> 20 [arrowhead=none];
+19 -> 21 [arrowhead=none];
+20 -> 21 [color="#aaaaaa" constraint=false];
+18 -> 22 [arrowhead=none];
+19 -> 22 [color="#aaaaaa" constraint=false];
+
+0  [label="zero"      ];
+1  [label="one"       ];
+2  [label="two"       ];
+3  [label="three"     ];
+4  [label="four"      ];
+5  [label="five"      ];
+6  [label="six"       ];
+7  [label="seven"     ];
+8  [label="eight"     ];
+9  [label="nine"      ];
+10 [label="ten"       ];
+11 [label="eleven"    ];
+12 [label="twelve"    ];
+13 [label="thirteen"  ];
+14 [label="fourteen"  ];
+15 [label="fivteen"   ];
+16 [label="sixteen"   ];
+17 [label="seventeen" ];
+18 [label="eighteen"  ];
+19 [label="nineteen"  ];
+20 [label="twenty"    ];
+21 [label="twenty-one"];
+22 [label="twenty-two"];
+
+}`
+			},
+			{
+				title: 'Graphviz - style attribute',
+				description: '',
+				graph: `digraph S {
+
+//
+// style= attribute controls aspects of nodes and edges.
+// The value of this attribute is a comma seperated
+// list of primitives with optional arguments.
+//
+
+solid  -> dashed    [ style=solid  label=solid  ];
+dashed -> dotted    [ style=dashed label=dashed ];
+dotted -> bold      [ style=dotted label=dotted ];
+bold   -> invis     [ style=bold   label=bold   ];
+solid  -> diagonals [ style=invis  label=invis  ];
+
+solid     [ style = solid     ];
+dashed    [ style = dashed    ];
+dotted    [ style = dotted    ];
+bold      [ style = bold      ];
+invis     [ style = invis     ];
+filled    [ style = filled    ];
+
+diagonals [ style = diagonals ];
+rounded   [ style = rounded   ];
+
+{ rank=same solid dashed dotted bold  invis filled}
+{ rank=same diagonals rounded }
+
+}`
+			},
+			{
+				title: 'escString',
+				description: 'In an escString, some escape sequences are replaced: \G with the name of the graph or the name of a cluster \N with the name of the node \H the name of the head node in an edge \T the name of the tail node in an edge',
+				graph: `digraph MyGraph {
+
+node [shape=box];
+
+node_one [ label="Name of Graph: \G\nName of Node: \N\n "    ];
+
+node_two;
+
+node_one -> node_two [label="The Edge '\E' connecting node \H to node \T"];
+
+subgraph clusterBlaBla {
+
+	label="Cluster (subgraph): \G";
+
+	node_three;
+
+};
+
+
+}`
+			}
+			// {
+			// 	title: '',
+			// 	description: '',
+			// 	graph: ``
+			// }
+		]
+
+		const render = (g, parent, cb) => viz.renderSVGElement(g).then(el => parent.appendChild(el) && cb())
+		const create = (tag, parent) => parent.appendChild(document.createElement(tag))
+
+		examples.forEach(ex => {
+			const div = create('div', document.body)
+			create('h3', div).innerHTML = ex.title
+			create('p', div).innerHTML = ex.description
+			render(ex.graph, div, () => create('pre', div).innerHTML = escape(ex.graph))
+		})
+	</script>
+</body>
+
+</html>

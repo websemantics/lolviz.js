@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Object Class Hierarchy Visualization</title>
+	<link rel="stylesheet" href="../css/index.css">
+	<link rel="stylesheet" href="../css/highlight.css">
+	<style>
+		body {
+			background-color: #fff;
+			padding: 0 40px;
+		}
+
+		h3 {
+			margin-top: 40px;
+		}
+	</style>
+</head>
+
+<body>
+	<h3>Object Class Hierarchy Visualization</h3>
+	<div class="digraph"></div>
+	<h3>Reflect.js Printer Result</h3>
+	<pre class="highlight"></pre>
+	<script type="module">
+		import { reflect, print } from '../../src/support/reflect.js';
+		import { highlight } from '../../src/support/highlight.js';
+		import { classviz, config } from '../../src/lolviz.js';
+		import Viz from '../lib/viz.js/viz.es.js';
+
+		const viz = new Viz({ workerURL: '../lib/viz.js/full.render.js' });
+
+		config('class_name_suffix', 'Class')
+
+		/* Example classes */
+		class Point {
+			constructor(x = 1, y) {
+				this.x = x;
+				this.y = y;
+			}
+			static distance(a, b) {
+				const dx = a.x - b.x;
+				const dy = a.y - b.y;
+
+				return Math.hypot(dx, dy);
+			}
+		}
+
+		Point.origin = 0 /* Static property */
+
+		class Shape {
+			constructor() {
+			}
+		}
+
+		class Rectangle extends Shape {
+			constructor(height, width) {
+				super()
+				this.height = height;
+				this.width = width;
+			}
+			get area() {
+				return this.calcArea();
+			}
+			calcArea() {
+				return this.height * this.width;
+			}
+		}
+
+		const point = new Point(5, 5)
+		const shape = new Shape()
+		const square = new Rectangle(10, 10)
+
+		const render = g => viz.renderSVGElement(g).then(el => document.querySelector('.digraph').appendChild(el))
+
+		render(classviz(shape, point, square))
+
+		/* Highlight object class hierarchy printer result */
+
+		const code = document.querySelector('.highlight')
+
+		code.innerHTML = [shape, square, point].map(o => highlight(print(reflect(o),'  '))).join('\n')
+
+	</script>
+</body>
+</html>

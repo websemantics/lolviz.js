@@ -1,5 +1,5 @@
 /**
- * Super tiny (questionable?) Javascript code highlighter
+ * Super tiny (questionable?) generic code highlighter
  *
  * @version 1.0.0
  * @copyright (c) 2016-2018, Web Semantics, Inc.
@@ -10,7 +10,7 @@
 const rules = {
   quote: ['([\'"])(.*?)[\'"]', '$1$2$1'],
   value: ['([0-9]+.?[0-9]*)', '$1'],
-  keyword: ['(const|new|let|class) ', '$1 '],
+  keyword: ['(const|new|let|class|extends) ', '$1 '],
   operator: ['([,()\\[\\]{}])', '$1'],
   comment: ['/\\*(.*)\\*/', '/*$1*/']
 }

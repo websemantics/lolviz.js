@@ -8,7 +8,9 @@
  * @license Distributed under the terms of the MIT License.
  */
 
-import { id, type, ctor, len, escape, repr, str, hasattr, list, chunk } from './support/python.js'
+import { id, len, escape, repr, str, hasattr, list, chunk } from './support/python.js'
+import { type, ctor } from './support/type.js'
+import { reflect } from './support/reflect.js'
 
 /**
  * Preferences.
@@ -25,7 +27,11 @@ const prefs = {
   /* how many chars before it's too wide and we go vertical? */
   max_horiz_array_len: 40,
   /* how many elements max to display in list (unused so far) */
-  max_list_elems: 10
+  max_list_elems: 10,
+  /* object class hierarchy */
+  class_public_prefix: '+',
+  class_static_prefix: '#',
+  class_name_suffix: '' /* ex. 'Class' */
 }
 
 /**
@@ -33,16 +39,21 @@ const prefs = {
  */
 const nodename = v => `node${id(v)}`
 
-const digraph = (body, o = {}) => {
-  const attrs = Object.entries(o)
-    .map(([k, v]) => `${k}=${v}`)
-    .join('\n')
+const digraph = (body, g = {}, n = {}) => {
+  const default_node_attrs = {
+    shape: 'box',
+    width: 0.1,
+    height: 0.1,
+    penwidth: prefs.penwidth,
+    color: prefs.color_black
+  }
+
+  const digraph_attrs = Object.entries(g).map(([k, v]) => `${k}=${v}`)
+  const node_attrs = Object.entries({ ...default_node_attrs, ...n }).map(([k, v]) => `${k}="${v}"`)
 
   return `digraph G {
-    ${attrs}
-    node [penwidth="${prefs.penwidth}", shape=box, width=.1, height=.1, color="${
-  prefs.color_black
-}"];
+    ${digraph_attrs.join('\n')}
+    node [${node_attrs.join(',')}];
     ${body}
   }`
 }
@@ -69,6 +80,45 @@ class Ellipsis {
  * @param {string|number} value
  */
 export const config = (key, value) => (prefs[key] = value)
+
+/**
+ * Display the class hierarchy of one or more releated objects (NEW)
+ *
+ * @param {array} objs - list of objects (obj1, obj2, etc)
+ */
+export function classviz(...objs) {
+  const nx = /* name suffix */ prefs.class_name_suffix
+  const defs = /* class definitions */ objs.map(obj => reflect(obj))
+  const attrs = {
+    shape: 'record',
+    style: 'filled',
+    fontsize: 11,
+    fontname: 'Helvetica',
+    fontcolor: prefs.color_black,
+    fillcolor: prefs.color_yellow
+  }
+
+  /* Helper arrow functions */
+  const map = (o, cb) => Object.entries(o).map(([k, v]) => cb(k, v))
+  const args = o => map(o, (name, val) => `${name}${val ? ` = ${val}` : ''}`)
+  const properties = (o, fx) => map(o, (k, v) => `${fx} ${k}: ${v}`)
+  const methods = (o, fx) => map(o, (k, v) => `${fx} ${k}(${args(v).join(', ')})`)
+  const node = (n, fx, m) => `${n} [label="{${n} ${nx}|${fx.join('\\l')}\\l|${m.join('\\l')}\\l}"]`
+
+  const nodes = defs.reduce((a, def) => {
+    const props = properties(def.props, prefs.class_public_prefix).concat(properties(def.static.props, prefs.class_static_prefix))
+    const mtds = methods(def.methods, prefs.class_public_prefix).concat(methods(def.static.methods, prefs.class_static_prefix))
+    return [...a, node(def.name, props, mtds)]
+  }, [])
+
+  const edges = defs.reduce((a, def) => [...a, `${def.extends}->${def.name}`], [])
+
+  const gb = `edge[dir=back, color="${prefs.color_black}", penwidth="0.5", arrowsize=.6]
+    ${nodes.join('\n')}
+    ${edges.join('\n')}`
+
+  return digraph(gb, {}, attrs)
+}
 
 /**
  * Show a string like an array.
