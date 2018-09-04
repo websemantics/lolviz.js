@@ -37,7 +37,7 @@ Here's an example of the three styles that can be displayed (fancy, b&w and clas
 
 This was achieved by making few tweaks to the original code to accumodate run-time changes to color and style (line thickness for example) in addition to making direct changes to the SVG DOM of the generated images.
 
-Also, check out [this reference](https://websemantics.github.io/lolviz.js/assets/demo/graphviz.html) for more examples of how to write/tweak graphviz dot graphs.
+Also, check out [this reference page](https://websemantics.github.io/lolviz.js/assets/demo/graphviz.html) for more examples of how to write/tweak graphviz dot graphs.
 
 ## New Features
 
