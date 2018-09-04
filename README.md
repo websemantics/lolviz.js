@@ -53,7 +53,7 @@ Check out this [example](https://websemantics.github.io/lolviz.js/assets/demo/te
 
 #### Class Hierarchy
 
-This feature is useful when you have a collection of related objects and want to visualize their internal structure and their class hierarchy that ties them together.
+This feature is useful when you have a collection of related objects and want to visualize their internal structure and the class hierarchy that ties them together.
 
 <img src="assets/img/reflect.png" width=850>
 
