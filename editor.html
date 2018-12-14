@@ -42,6 +42,7 @@
     </div>
 
     <button id="renderbutton">Render</button>
+    <a href="#" class="link-download">Download displayed SVG</a>
     <div id="content" />
 
     <script type="module">
@@ -66,6 +67,18 @@
         const digraph = create("div", parent);
         digraph.setAttribute("class", "digraph");
 
+        const saveToFile = (evt) => {
+            const svgContent = digraph.firstChild.outerHTML;
+            const blob = new Blob([svgContent], {
+                type: "image/svg+xml"
+            });
+            const url = window.URL.createObjectURL(blob);
+            const link = evt.target;
+            link.target = "_blank";
+            link.download = "visualization.svg";
+            link.href = url;
+        }
+
         const paint = () => {
 
             /* Clear content */
@@ -87,6 +100,7 @@
             });
             eval(codeString);
         };
+        document.querySelector(".link-download").addEventListener("click", saveToFile);
 
         paint();
     </script>
