@@ -50,6 +50,7 @@ header::after {
 }
 
 .navbar {
+  color: #5a5d72;
   align-items: center;
   background-color: #fff;
   border-bottom: 1px solid #cfcfcf;
