@@ -15,7 +15,8 @@
 </head>
 
 <body>
-  <nav class="navbar">
+  <header>
+  <div class="navbar">
     <h2><a href="https://github.com/websemantics/lolviz.js">Lolviz<b style="color:#ff8e00; margin: 0 3px;">.</b>js</a></h2>
     <div class="push"></div>
     <input type="checkbox" id="paintcan" name="paintcan" checked="checked">
@@ -38,9 +39,9 @@
       <span class="tooltiptext">Switch custom style on/off</span>
     </label>
 
-    </nav>
-
-  <div id="content"></div>
+    </div>
+  </header>
+  <div id="content" style="padding: 100px;"></div>
 
   <script type="module">
     import { ord, chr, array, range, len } from './src/support/python.js'

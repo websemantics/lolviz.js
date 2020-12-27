@@ -9,7 +9,6 @@ body {
   font-weight: 400;
   line-height: 1.75;
   margin: 0;
-  padding: 100px;
   text-rendering: optimizeLegibility;
 }
 
@@ -20,17 +19,48 @@ a {
 
 /* Navbar styles */
 
+header {
+  /* source @ https://stijndewitt.com/2018/06/12/pure-css-drop-shadow-on-scroll/ */
+  position: sticky;
+  top: -16px;
+  z-index: 1;
+  color: white;
+  text-align: center;
+  -webkit-backface-visibility: hidden;
+}
+
+header::before,
+header::after {
+  content: '';
+  display: block;
+  height: 16px;
+  position: sticky;
+  -webkit-position: sticky;
+}
+
+header::before {
+  top: 44px;
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.5);
+}
+
+header::after {
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+
 .navbar {
   align-items: center;
   background-color: #fff;
   border-bottom: 1px solid #cfcfcf;
-  box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
   display: flex;
   left: 0;
   padding: 10px 100px;
-  position: fixed;
-  top: 0;
   width: 100vw;
+  position: sticky;
+  top: 0px;
+  margin-top: -16px;
+  z-index: 3;
 }
 
 .navbar > * {
@@ -114,7 +144,6 @@ select:focus {
 	color: #222;
 	outline: none;
 }
-
 
 /* Digraph styles */
 
