@@ -45,6 +45,11 @@
         background-color: #fff2f0;
         border-bottom: 1px solid #dcdcdc;
       }
+
+      .ace_content,
+      .ace_gutter {
+        padding-top: 10px;
+      }
     </style>
   </head>
 
@@ -185,9 +190,6 @@
 
         editor.session.setMode(new JavaScriptMode());
 
-        console.log(examples)
-        // codeSelect
-
         editor.on("blur", evt => paint())
         dark.onchange = ({ target }) => editor.setTheme(target.checked ? "ace/theme/twilight" : "ace/theme/textmate")
         paintcan.onchange = evt => paint();
@@ -196,11 +198,12 @@
         downloadButton.onclick = saveToFile
 
         /* Add examples to select element */
-        codeSelect.innerHTML = examples.map(({title},i) => `<option value="${i}">${title}</option>`).join('')
-        codeSelect.onchange = ({target}) => paint(editor.setValue(examples[target.value].code, 1))
+        codeSelect.innerHTML = examples.map(({ title }, i) => `<option value="${i}">${title}</option>`).join('')
+        codeSelect.onchange = ({ target }) => paint(editor.setValue(examples[target.value].code, 1))
 
-
+        /* Set to first example */
         editor.setValue(examples[0].code, 1)
+
         paint();
       }
 
