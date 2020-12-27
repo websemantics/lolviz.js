@@ -12,7 +12,7 @@ For more information please check the [original project page](https://github.com
 
 [![Live demo](https://img.shields.io/badge/Live%20demo-%E2%86%92-9D6EB3.svg?style=flat-square)](https://websemantics.github.io/lolviz.js)
 
-Also, see [examples](https://websemantics.github.io/lolviz.js/assets/demo/examples.html)
+Also, see [examples](https://websemantics.github.io/lolviz.js/assets/demo/examples.html) or try [live editor](https://websemantics.github.io/lolviz.js/assets/demo/examples.html)
 
 ## Assumptions
 
