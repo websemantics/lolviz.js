@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Editor</title>
+  <link rel="stylesheet" href="assets/css/index.css">
+  <link rel="stylesheet" href="assets/css/highlight.css">
+  <script src="assets/lib/ace.js/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="assets/lib/ace.js/theme-twilight.js" type="text/javascript" charset="utf-8"></script>
+  <script src="assets/lib/ace.js/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
+  <style>
+    /* Remove the graph default white background */
+    .graph > polygon:first-of-type {
+      fill: none;
+    }
+  </style>
+  <style type="text/css" media="screen">
+    #editor {
+
+        height: 200px;
+        width: 100%;
+    }
+</style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <h2><a href="https://github.com/websemantics/lolviz.js">Lolviz<b style="color:#ff8e00; margin: 0 3px;">.</b>js Editor</a></h2>
+        <div class="push"></div>
+        <input type="checkbox" id="paintcan" name="paintcan" checked="checked">
+        <label for="paintcan" title="Switch colors on/off">
+            <!-- octicons --><svg viewBox="0 0 12 16" width="16px" height="16px"><path fill="currentColor" d="M6 0C2.69 0 0 2.69 0 6v1c0 .55.45 1 1 1v5c0 1.1 2.24 2 5 2s5-.9 5-2V8c.55 0 1-.45 1-1V6c0-3.31-2.69-6-6-6zm3 10v.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5V10c0-.28-.22-.5-.5-.5s-.5.22-.5.5v2.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-2c0-.28-.22-.5-.5-.5s-.5.22-.5.5v.5c0 .55-.45 1-1 1s-1-.45-1-1v-1c-.55 0-1-.45-1-1V7.2c.91.49 2.36.8 4 .8 1.64 0 3.09-.31 4-.8V9c0 .55-.45 1-1 1zM6 7c-1.68 0-3.12-.41-3.71-1C2.88 5.41 4.32 5 6 5c1.68 0 3.12.41 3.71 1-.59.59-2.03 1-3.71 1zm0-3c-2.76 0-5 .89-5 2 0-2.76 2.24-5 5-5s5 2.24 5 5c0-1.1-2.24-2-5-2z"></path></svg></label>
+
+        <input type="checkbox" id="flame" name="flame" checked="checked">
+        <label for="flame" title="Switch custom style on/off">
+            <!-- octicons --><svg viewBox="0 0 12 16" width="16px" height="16px"><path fill="currentColor" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></label>
+        </nav>
+    <div id="editor">
+            const vlist = ["2016-08-12", 107.779999, 108.440002, 107.779999, 108.18]
+            render(objviz(vlist))
+    </div>
+
+    <button id="renderbutton">Render</button>
+    <a href="#" class="link-download">Download displayed SVG</a>
+    <div id="content" />
+
+    <script type="module">
+        import { ord, chr, array, range, len } from "./src/support/python.js"
+        import { config, listviz, lolviz, objviz, strviz, treeviz, callviz, classviz } from "./src/lolviz.js";
+        import Viz from "./assets/lib/viz.js/viz.es.js";
+        import { fancy } from "./src/support/fancy.js";
+
+        const viz = new Viz({ workerURL: "./assets/lib/viz.js/full.render.js" });
+
+        paintcan.onchange = evt => paint();
+        flame.onchange = evt => paint();
+        renderbutton.onclick = evt => paint();
+
+        const editor = ace.edit("editor");
+        editor.setTheme("ace/theme/twilight");
+        const JavaScriptMode = ace.require("ace/mode/javascript").Mode;
+        editor.session.setMode(new JavaScriptMode());
+
+        const create = (tag, parent) => parent.appendChild(document.createElement(tag));
+        const parent = document.getElementById("content");
+        const digraph = create("div", parent);
+        digraph.setAttribute("class", "digraph");
+
+        const saveToFile = (evt) => {
+            const svgContent = digraph.firstChild.outerHTML;
+            const blob = new Blob([svgContent], {
+                type: "image/svg+xml"
+            });
+            const url = window.URL.createObjectURL(blob);
+            const link = evt.target;
+            link.target = "_blank";
+            link.download = "visualization.svg";
+            link.href = url;
+        }
+
+        const paint = () => {
+
+            /* Clear content */
+            content.innerHTML = ""
+
+            config('penwidth', flame.checked ? 0.9 : 0.5);
+            config('color_yellow', paintcan.checked ? '#fefecd' : '#ffffff');
+            config('color_blue', paintcan.checked ? '#d9e6f5' : '#ffffff');
+            config('color_green', paintcan.checked ? '#cfe2d4' : '#ffffff');
+
+
+            const codeString = editor.getValue();
+            const render = (g) => viz.renderSVGElement(g).then(el => {
+                if (digraph.firstChild) {
+                    digraph.replaceChild(flame.checked ? fancy(el) : el, digraph.firstChild);
+                } else {
+                    digraph.appendChild(flame.checked ? fancy(el) : el);
+                }
+            });
+            eval(codeString);
+        };
+        document.querySelector(".link-download").addEventListener("click", saveToFile);
+
+        paint();
+    </script>
+  </body>
+
+  </html>
