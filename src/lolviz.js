@@ -11,16 +11,15 @@
 import { id, type, ctor, len, escape, repr, str, hasattr, list, chunk } from './support/python.js'
 import { reflect } from './support/reflect.js'
 
+const colors = { black: '#444443', yellow: '#fefecd', blue: '#d9e6f5', green: '#cfe2d4' }
+
 /**
  * Preferences.
  */
 export const prefs = {
+  colors,
   /* style properties */
   penwidth: 0.5,
-  color_black: '#444443',
-  color_yellow: '#fefecd',
-  color_blue: '#d9e6f5',
-  color_green: '#cfe2d4',
   /* how many chars before we abbreviate with ...? */
   max_str_len: 20,
   /* how many chars before it's too wide and we go vertical? */
@@ -30,7 +29,11 @@ export const prefs = {
   /* object class hierarchy */
   class_public_prefix: '+',
   class_static_prefix: '#',
-  class_name_suffix: '' /* ex. 'Class' */
+  class_name_suffix: '', /* ex. 'Class' */
+  /* arrow style properties */
+  arrow_style: `[arrowtail=dot, penwidth="0.5", color="${colors.black}", arrowsize=.4, weight=100]`,
+  /* graph node style */
+  node_style: { penwidth: 0.5, shape: 'box', width: 0.1, height: 0.1 }
 }
 
 /**
@@ -38,21 +41,16 @@ export const prefs = {
  */
 const nodename = v => `node${id(v)}`
 
-const digraph = (body, g = {}, n = {}) => {
-  const default_node_attrs = {
-    shape: 'box',
-    width: 0.1,
-    height: 0.1,
-    penwidth: prefs.penwidth,
-    color: prefs.color_black
-  }
+const digraph = (body, digraph_attrs = {}, node_attrs = {}, command = 'digraph', id = 'G') => {
+  node_attrs = { ...prefs.node_style, penwidth: prefs.penwidth, color: prefs.colors.black, ...node_attrs }
 
-  const digraph_attrs = Object.entries(g).map(([k, v]) => `${k}=${v}`)
-  const node_attrs = Object.entries({ ...default_node_attrs, ...n }).map(([k, v]) => `${k}="${v}"`)
+  digraph_attrs = Object.entries(digraph_attrs).map(([k, v]) => `${k}=${v}`).join('\n')
+  node_attrs = Object.entries(node_attrs).map(([k, v]) => `${k}="${v}"`).join(',')
 
-  return `digraph G {
-    ${digraph_attrs.join('\n')}
-    node [${node_attrs.join(',')}];
+  return `${command} ${id} {
+    ${digraph_attrs}
+    node [${node_attrs}];
+    graph [overlap=false];
     ${body}
   }`
 }
@@ -88,14 +86,7 @@ export const config = (key, value) => (prefs[key] = value)
 export function classviz(...objs) {
   const nx = /* name suffix */ prefs.class_name_suffix
   const defs = /* class definitions */ objs.map(obj => reflect(obj))
-  const attrs = {
-    shape: 'record',
-    style: 'filled',
-    fontsize: 11,
-    fontname: 'Helvetica',
-    fontcolor: prefs.color_black,
-    fillcolor: prefs.color_yellow
-  }
+  const node_attrs = { shape: 'record', style: 'filled', fontsize: 11, fontname: 'Helvetica', fontcolor: prefs.colors.black, fillcolor: prefs.colors.yellow }
 
   /* Helper arrow functions */
   const map = (o, cb) => Object.entries(o).map(([k, v]) => cb(k, v))
@@ -112,11 +103,11 @@ export function classviz(...objs) {
 
   const edges = defs.reduce((a, def) => [...a, `${def.extends}->${def.name}`], [])
 
-  const gb = `edge[dir=back, color="${prefs.color_black}", penwidth="0.5", arrowsize=.6]
+  const gb = `edge[dir=back, color="${prefs.colors.black}", penwidth="0.5", arrowsize=.6]
     ${nodes.join('\n')}
     ${edges.join('\n')}`
 
-  return digraph(gb, {}, attrs)
+  return digraph(gb, {}, node_attrs)
 }
 
 /**
@@ -150,7 +141,7 @@ export function listviz(elems, { showassoc = true, shape = [], showindexes = !sh
  * @param {Object} c - Cluster to visualize.
  */
 export function clusterviz(c, { orientation = 'TB', vertical = 0.1, horizontal = 0.3, label, title, minimal } = {}) {
-  const g_attrs = { nodesep: vertical, ranksep: horizontal, penwidth: '.7', pencolor: `"${prefs.color_green}"`, rankdir: orientation, fontname: 'Helvetica', fontcolor: `"${prefs.color_black}"`, fontsize: 8 }
+  const g_attrs = { nodesep: vertical, ranksep: horizontal, penwidth: '.7', pencolor: `"${prefs.colors.green}"`, rankdir: orientation, fontname: 'Helvetica', fontcolor: `"${prefs.colors.black}"`, fontsize: 8 }
   const cluster_links = []
 
   const body = Array.from(c.graphs).map(([id, g]) => {
@@ -158,7 +149,7 @@ export function clusterviz(c, { orientation = 'TB', vertical = 0.1, horizontal =
 
     cluster_links.push(...links)
 
-    return digraph(`${nodes.join('\n  ')}`, { ...g_attrs, label: `"${g.label || id}"` }, 'subgraph', `cluster_${id}`)
+    return digraph(`${nodes.join('\n  ')}`, { ...g_attrs, label: `"${g.label || id}"` }, {}, 'subgraph', `cluster_${id}`)
   })
 
   return digraph(`${body.join('\n')}${cluster_links.join('\n')}`, g_attrs)
@@ -172,39 +163,39 @@ export function clusterviz(c, { orientation = 'TB', vertical = 0.1, horizontal =
  * @param {string} [orientation='LR'] - Layout orientation.
  */
 export function graphviz(g, { orientation = 'TB', vertical = 0.1, horizontal = 0.3, label, title, minimal } = {}) {
-  const g_attrs = { nodesep: vertical, ranksep: horizontal, penwidth: '.7', pencolor: `"${prefs.color_green}"`, rankdir: orientation, fontname: 'Helvetica', fontcolor: `"${prefs.color_black}"`, fontsize: 8 }
+  const g_attrs = { nodesep: vertical, ranksep: horizontal, penwidth: '.7', pencolor: `"${prefs.colors.green}"`, rankdir: orientation, fontname: 'Helvetica', fontcolor: `"${prefs.colors.black}"`, fontsize: 8 }
   if (label) g_attrs.label = `"${label}"`
 
   const { nodes, links } = graph_parts(g, { title, minimal })
 
-  return digraph(`${links.join('\n  ')} ${nodes.join('\n  ')}`, g_attrs )
+  return digraph(`${links.join('\n  ')} ${nodes.join('\n  ')}`, g_attrs)
 }
 
 function graph_parts(g, { title = n => ctor(n), minimal = false }) {
   /* Clone nodes and remove adjacent array */
   const gnodes = Array.from(g.nodes.values()).map(n => n.clone()).map(n => delete n.adjacent && n)
   const links = g.edges.map(([from, to]) => `"${from.id}" -> "${to.id}" ${prefs.arrow_style};`)
-  const nodes = gnodes.map(n => `    "${n.id}" [width=0,height=0, color="${prefs.color_black}", fontcolor="${prefs.color_black}", fontname="Helvetica", style=filled, fillcolor="${prefs.color_yellow}", label=<${graph_node_html(n, { minimal, title: title(n) })}>];\n`)
+  const nodes = gnodes.map(n => `    "${n.id}" [width=0,height=0, color="${prefs.colors.black}", fontcolor="${prefs.colors.black}", fontname="Helvetica", style=filled, fillcolor="${prefs.colors.yellow}", label=<${graph_node_html(n, { minimal, title: title(n) })}>];\n`)
 
   return { nodes, links }
 }
 
-function graph_node_html(n, { title, minimal, bgcolor = prefs.color_yellow } = {}) {
+function graph_node_html(n, { title, minimal, bgcolor = prefs.colors.yellow } = {}) {
   const rows = []
   const blankrow = `<tr><td colspan="3" cellpadding="1" border="0" bgcolor="${bgcolor}"></td></tr>`
 
   if (title) {
-    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="${minimal ? 0 : 1}" sides="b" align="center"><font color="${prefs.color_black}" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
+    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="${minimal ? 0 : 1}" sides="b" align="center"><font color="${prefs.colors.black}" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
   }
 
   if (!minimal) {
     Object.entries(n).forEach(([key, value]) => {
       let sep = '<td cellspacing="0" cellpadding="0" border="0"></td>'
-      let name = `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="Helvetica" color="${prefs.color_black}" point-size="11">${key} </font></td>\n`
+      let name = `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="Helvetica" color="${prefs.colors.black}" point-size="11">${key} </font></td>\n`
 
       const v = value !== null ? repr(abbrev_and_escape(str(value))) : '   '
 
-      value = `<td  cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="left"><font color="${prefs.color_black}" point-size="11">  ${v}</font></td>\n`
+      value = `<td  cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="left"><font color="${prefs.colors.black}" point-size="11">  ${v}</font></td>\n`
       rows.push(`<tr>${name}${sep}${value}</tr>\n`)
     })
   }
@@ -224,15 +215,12 @@ function graph_node_html(n, { title, minimal, bgcolor = prefs.color_yellow } = {
  * @param {string} rightfield
  * @param {boolean} minimal - Hide title, field keys and left right fields on leaves
  */
-export function treeviz(
-  root,
-  { title, minimal = false, leftfield = 'left', rightfield = 'right' } = {}
-) {
+export function treeviz(root, { title, minimal = false, leftfield = 'left', rightfield = 'right' } = {}) {
   if (root === null) return ''
 
   const reachable = closure(root)
 
-  const leaf = v => !v[leftfield] && !v[rightfield]
+  const leaf = (v) => !v[leftfield] && !v[rightfield]
   const tree_nodes = reachable.map((p) => {
     const fields = Object.entries(p)
       .filter(([k]) => k !== leftfield && k !== rightfield)
@@ -276,10 +264,7 @@ export function lolviz(table, { showassoc = true, shape = [], showindexes = !sha
   const nodes = table.map(sublist =>
     gr_list_node(nodename(sublist), sublist, { showindexes, shape }))
 
-  const links = table.map((sublist, i) =>
-    `${nodename(table)}:${str(i)} -> ${nodename(sublist)}:w [arrowtail=dot, penwidth="0.5", color="${
-      prefs.color_black
-    }", arrowsize=.4, weight=100]\n`)
+  const links = table.map((sublist, i) => `${nodename(table)}:${str(i)} -> ${nodename(sublist)}:w ${prefs.arrow_style}\n`)
 
   const gb = `${vlist}${nodes.join('')}${links.join('')}`
 
@@ -308,8 +293,6 @@ export function callviz(varnames = null, frame = null) {
  * parameters. You can limit the variables displayed by passing in a list of
  * `varnames` as an argument.
  *
- * ~ NOT IMPLMENTED ~
- *
  * @param {*} varnames
  * @param {*} callstack
  */
@@ -317,6 +300,7 @@ function callsviz(varnames = null, callstack = null) {
   const gb = ''
   return digraph(gb, { nodesep: 0.1, ranksep: 0.1, rankdir: 'LR' })
 
+  console.log(varnames, callstack)
   // /* Get stack frame nodes so we can stack 'em up */
   // if (callstack === null) {
   //   stack = inspect.stack()
@@ -332,7 +316,7 @@ function callsviz(varnames = null, callstack = null) {
   // /* Draw all stack frame nodes together so we can use rank=same */
   // s += '\n{ rank=same;\n'
   // callstack = list(reversed(callstack))
-  // for (f in callstack) s += obj_node(f, varnames)
+  // for (f in callstack) s += obj_node(f, {varnames })
 
   // for (i in range(len(callstack) - 1)) {
   //   _this = callstack[i]
@@ -371,10 +355,10 @@ function ignoresym(sym) {
  * @param {Object} o - Object to visualize.
  * @param {string} [orientation='LR'] - Layout orientation.
  */
-export function objviz(o, { orientation = 'LR', shape = [] } = {}) {
+export function objviz(o, { orientation = 'LR', node_label, shape = [] } = {}) {
   const reachable = closure(hasattr(o, Symbol.iterator) ? list(o) : o)
 
-  const gb = `${obj_nodes(reachable)}\n${obj_edges(reachable)}`
+  const gb = `${obj_nodes(reachable, { node_label })}\n${obj_edges(reachable)}`
   return digraph(gb, { nodesep: 0.1, ranksep: 0.3, rankdir: orientation })
 }
 
@@ -384,7 +368,7 @@ export function objviz(o, { orientation = 'LR', shape = [] } = {}) {
  *
  * @param {object} nodes -
  */
-function obj_nodes(nodes) {
+function obj_nodes(nodes, options = {}) {
   let s = ''
   let c = 1
   const [max_edges_for_type, subgraphs] = connected_subgraphs(nodes)
@@ -393,24 +377,24 @@ function obj_nodes(nodes) {
     const firstelement = g[0]
 
     if (/* linked list */ max_edges_for_type[ctor(firstelement)] === 1) {
-      s += `subgraph cluster${c++} {style=invis penwidth=.7 pencolor="${prefs.color_green}"
-      ${g.map(p => obj_node(p)).join('')}
+      s += `subgraph cluster${c++} {style=invis penwidth=.7 pencolor="${prefs.colors.green}"
+      ${g.map(p => obj_node(p, options)).join('')}
       }`
     } else if (/* binary tree */ max_edges_for_type[ctor(firstelement)] === 2) {
-      s += g.map(p => obj_node(p)).join('') /* nothing special for now */
+      s += g.map(p => obj_node(p, options)).join('') /* nothing special for now */
     }
   })
 
   /* now dump disconnected nodes */
   nodes.forEach((p) => {
     const found = subgraphs.reduce((acc, g) => acc || g.includes(p), false)
-    if (!found) s += obj_node(p)
+    if (!found) s += obj_node(p, options)
   })
 
   return s
 }
 
-function obj_node(p, varnames = null) {
+function obj_node(p, { varnames = null, node_label = (p) => ctor(p) } = {}) {
   let s = ''
 
   if (typeof p === 'types.FrameType') {
@@ -440,11 +424,10 @@ function obj_node(p, varnames = null) {
     //           else:
     //               items.append((k, k, None))
     //       s += '// FRAME %s\n' % caller_scopename
-    //       s += gr_dict_node(nodename, caller_scopename, items, highlight=argnames,
-    //            bgcolor=prefs.color_blue,
+    //       s += gr_dict_node(nodename, caller_scopename, items, highlight=argnames, bgcolor=prefs.colors.blue,
     //                         separator=None, reprkey=False)
   } else if (type(p) === 'dict') {
-    /* print "DRAW DICT", p, '@ node' + nodename */
+    //       # print "DRAW DICT", p, '@ node' + nodename
     const items = Object.entries(p)
       // if varnames is not None and k not in varnames: continue
       .filter(([k, v]) => !(varnames !== null && !varnames.includes(k)))
@@ -453,18 +436,15 @@ function obj_node(p, varnames = null) {
     s += '// DICT\n'
     s += gr_dict_node(nodename(p), null, items, { separator: null })
   } else if (/* special case "empty array" */ type(p) === 'array' && len(p) === 0) {
-    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${
-      prefs.color_black
-    }" point-size="9">empty array</font>>];\n`
+    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${prefs.colors.black
+      }" point-size="9">empty array</font>>];\n`
   } else if (typeof p === 'boolean') {
-    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${
-      prefs.color_black
-    }" point-size="9">${str(p)}</font>>];\n`
+    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${prefs.colors.black
+      }" point-size="9">${str(p)}</font>>];\n`
   } else if (typeof p === 'object' && len(p) === 0) {
     /* special case "empty object" */
-    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${
-      prefs.color_black
-    }" point-size="9">empty object</font>>];\n`
+    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${prefs.colors.black
+      }" point-size="9">empty object</font>>];\n`
   } else if ((type(p) === 'array' || hasattr(p, Symbol.iterator)) && isatomlist(p)) {
     /* print "DRAW LIST", p, '@ node' + nodename */
     const elems = Array.from(p).map(el => (isatom(el) ? el : null))
@@ -489,31 +469,27 @@ function obj_node(p, varnames = null) {
     /* print "DRAW OBJ", p, '@ node' + nodename */
     const fields = Object.entries(p).map(([k, v]) => (isatom(v) ? [k, k, v] : [k, k, null]))
 
-    s += `//${ctor(p)} OBJECT with fields
-      ${gr_dict_node(nodename(p), ctor(p), fields, {
-    separator: null,
-    reprkey: false
-  })}
+    const label = node_label(p)
+
+    s += `//${label} OBJECT with fields
+      ${gr_dict_node(nodename(p), label, fields, { separator: null, reprkey: false })}
       `
   } else {
-    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${
-      prefs.color_black
-    }" point-size="9">CANNOT HANDLE: type==${abbrev_and_escape(`${type(p)} '${repr(p)}'`)}</font>>];\n`
+    s += `${nodename(p)} [margin="0.03", shape=none label=<<font face="Times-Italic" color="${prefs.colors.black
+      }" point-size="9">CANNOT HANDLE: type==${abbrev_and_escape(`${type(p)} '${repr(p)}'`)}</font>>];\n`
   }
 
   return s
 }
 
 function obj_edges(nodes, varnames = null) {
-  /* Edges start at right edge not center for vertical lists */
+  /* edges start at right edge not center for vertical lists */
   const es = edges(nodes, varnames).map(([p, label, q]) =>
-    Array.isArray(p) && !isatomlist(p)
-      ? `${nodename(p)}:${label} -> ${nodename(q)}:w [arrowtail=dot, penwidth="0.5", color="${
-        prefs.color_black
-      }", arrowsize=.4, weight=100]`
-      : `${nodename(p)}:${label}:c -> ${nodename(q)} [dir=both, tailclip=false, arrowtail=dot, penwidth="0.5", color="${
-        prefs.color_black
-      }", arrowsize=.4]`)
+  (Array.isArray(p) && !isatomlist(p)
+    ? `${nodename(p)}:${label} -> ${nodename(q)}:w [arrowtail=dot, penwidth="0.5", color="${prefs.colors.black
+    }", arrowsize=.4, weight=100]`
+    : `${nodename(p)}:${label}:c -> ${nodename(q)} [dir=both, tailclip=false, arrowtail=dot, penwidth="0.5", color="${prefs.colors.black
+    }", arrowsize=.4]`))
 
   return es.join('')
 }
@@ -538,45 +514,33 @@ export function elviz(el, showassoc) {
   return escape(els)
 }
 
-function gr_list_node(
-  nm,
-  elems,
-  { title, shape = [], bgcolor = prefs.color_yellow, showindexes = true } = {}
-) {
+function gr_list_node(nm, elems, { title, shape = [], bgcolor = prefs.colors.yellow, showindexes = true } = {}) {
   const node_shape = elems.length > 0 ? 'box' : 'none'
 
-  let html = `<font face="Times-Italic" color="${
-    prefs.color_black
-  }" point-size="9">empty list</font>`
+  let html = `<font face="Times-Italic" color="${prefs.colors.black}" point-size="9">empty list</font>`
 
   if (elems.length > 0) {
-    /* Compute just to see eventual size */
+    /* compute just to see eventual size */
     const abbrev_values = abbrev_and_escape_values(elems)
 
     if (len(abbrev_values.join('')) <= prefs.max_horiz_array_len || len(shape) > 0) {
-      html = gr_listtable_html(elems, { title, bgcolor: prefs.color_blue, showindexes, shape })
+      html = gr_listtable_html(elems, { title, bgcolor: prefs.colors.blue, showindexes, shape })
     } else {
       html = gr_vlist_html(elems, { title, bgcolor, showindexes })
     }
   }
 
-  return `${nm} [shape="${node_shape}", space="0.0", margin="0.01", fontcolor="${
-    prefs.color_black
-  }", fontname="Helvetica", label=<${html}>];\n`
+  return `${nm} [shape="${node_shape}", space="0.0", margin="0.01", fontcolor="${prefs.colors.black
+    }", fontname="Helvetica", label=<${html}>];\n`
 }
 
-function gr_listtable_html(
-  values,
-  { title, shape = [], bgcolor = prefs.color_yellow, showindexes = true }
-) {
+function gr_listtable_html(values, { title, shape = [], bgcolor = prefs.colors.yellow, showindexes = true }) {
   const index_html = (s, last_col = false, sides = last_col ? 'b' : 'br') =>
-    `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="${sides}" valign="top"><font color="${
-      prefs.color_black
+    `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="${sides}" valign="top"><font color="${prefs.colors.black
     }" point-size="9">${s}</font></td>\n`
 
   const value_html = (p, s, last_col, last_row) =>
-    `<td port="${p}" bgcolor="${bgcolor}" border="${last_col && last_row ? '0' : '1'}" sides="${
-      last_col ? '' : 'r'
+    `<td port="${p}" bgcolor="${bgcolor}" border="${last_col && last_row ? '0' : '1'}" sides="${last_col ? '' : 'r'
     }${last_row ? '' : 'b'}" align="center"><font point-size="11">${s}</font></td>\n`
 
   const newvalues = values.map(v =>
@@ -620,9 +584,8 @@ function gr_listtable_html(
       .concat([index_html('...'), index_html(cols - 1, true)])
   }
 
-  const titlerow = `<tr><td cellspacing="0" colspan="${cols}" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${
-    prefs.color_black
-  }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`
+  const titlerow = `<tr><td cellspacing="0" colspan="${cols}" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${prefs.colors.black
+    }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`
 
   return `<table BORDER="0" CELLBORDER="0" CELLSPACING="0">
     ${title ? titlerow : ''}
@@ -631,54 +594,39 @@ function gr_listtable_html(
     </table>`
 }
 
-function gr_dict_node(
-  nodename,
-  title,
-  items,
-  { highlight = null, bgcolor = prefs.color_yellow, separator = '&rarr;', reprkey = true } = {}
-) {
+function gr_dict_node(nodename, title, items, { highlight = null, bgcolor = prefs.colors.yellow, separator = '&rarr;', reprkey = true } = {}) {
   const html = gr_dict_html(title, items, { highlight, bgcolor, separator, reprkey })
-  return `${nodename} [margin="0.03", color="${prefs.color_black}", fontcolor="${
-    prefs.color_black
-  }", fontname="Helvetica", style=filled, fillcolor="${bgcolor}", label=<${html}>];\n`
+  return `${nodename} [margin="0.03", color="${prefs.colors.black}", fontcolor="${prefs.colors.black}", fontname="Helvetica", style=filled, fillcolor="${bgcolor}", label=<${html}>];\n`
 }
 
-function gr_dict_html(
-  title,
-  items,
-  { highlight = null, bgcolor = prefs.color_yellow, separator = '&rarr;', reprkey = true } = {}
-) {
+function gr_dict_html(title, items, { highlight = null, bgcolor = prefs.colors.yellow, separator = '&rarr;', reprkey = true } = {}) {
   const header = '<table BORDER="0" CELLPADDING="0" CELLBORDER="1" CELLSPACING="0">\n'
 
   const blankrow = `<tr><td colspan="3" cellpadding="1" border="0" bgcolor="${bgcolor}"></td></tr>`
   const rows = []
 
   if (title !== null) {
-    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${
-      prefs.color_black
-    }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
+    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${prefs.colors.black
+      }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
   }
 
   const ptrs = items.filter(it => !isatom(it[2]))
   const atoms = items.filter(it => isatom(it[2]))
 
   if (items.length > 0) {
-    /* Do atoms first then ptrs */
+    /* do atoms first then ptrs */
     atoms.concat(ptrs).forEach(([label, key, value]) => {
       const font = highlight && key in highlight ? 'Times-Italic' : 'Helvetica'
 
-      let name = `<td port="${label}_label" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="${font}" color="${
-        prefs.color_black
-      }" point-size="11">${reprkey ? repr(key) : key} </font></td>\n`
+      let name = `<td port="${label}_label" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="${font}" color="${prefs.colors.black
+        }" point-size="11">${reprkey ? repr(key) : key} </font></td>\n`
       let sep = '<td cellspacing="0" cellpadding="0" border="0"></td>'
 
       if (separator) {
-        name = `<td port="${label}_label" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0" align="right"><font face="${font}" color="${
-          prefs.color_black
-        }" point-size="11">${reprkey ? repr(key) : key} </font></td>\n`
-        sep = `<td cellpadding="0" border="0" valign="bottom"><font color="${
-          prefs.color_black
-        }" point-size="9">${separator}</font></td>`
+        name = `<td port="${label}_label" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0" align="right"><font face="${font}" color="${prefs.colors.black
+          }" point-size="11">${reprkey ? repr(key) : key} </font></td>\n`
+        sep = `<td cellpadding="0" border="0" valign="bottom"><font color="${prefs.colors.black
+          }" point-size="9">${separator}</font></td>`
       }
 
       let v = '   '
@@ -687,9 +635,8 @@ function gr_dict_html(
         v = repr(value)
       }
 
-      value = `<td port="${label}" cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="left"><font color="${
-        prefs.color_black
-      }" point-size="11"> ${v}</font></td>\n`
+      value = `<td port="${label}" cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="left"><font color="${prefs.colors.black
+        }" point-size="11"> ${v}</font></td>\n`
       rows.push(`<tr>${name}${sep}${value}</tr>\n`)
     })
   } else {
@@ -700,26 +647,16 @@ function gr_dict_html(
   return header + rows.join('\n') + tail
 }
 
-function gr_vlol_node(
-  nodename,
-  elems,
-  { title = null, bgcolor = prefs.color_green, showindexes = true, showelems = false } = {}
-) {
+function gr_vlol_node(nodename, elems, { title = null, bgcolor = prefs.colors.green, showindexes = true, showelems = false } = {}) {
   const html = gr_vlol_html(elems, { title, bgcolor, showindexes, showelems })
-  return `${nodename} [color="${prefs.color_black}", margin="0.02", fontcolor="${
-    prefs.color_black
-  }", fontname="Helvetica", style=filled, fillcolor="${bgcolor}", label=<${html}>];\n`
+  return `${nodename} [color="${prefs.colors.black}", margin="0.02", fontcolor="${prefs.colors.black}", fontname="Helvetica", style=filled, fillcolor="${bgcolor}", label=<${html}>];\n`
 }
 
-function gr_vlol_html(
-  elems,
-  { title = null, bgcolor = prefs.color_green, showindexes = true, showelems = false } = {}
-) {
+function gr_vlol_html(elems, { title = null, bgcolor = prefs.colors.green, showindexes = true, showelems = false } = {}) {
   if (elems.length === 0) return ' '
 
   const td = (label, port, b, p, sides, bg = bgcolor) =>
-    `<td port="${port}" BORDER="${b}" cellpadding="${p}" ${sides} cellspacing="0" bgcolor="${bg}" align="left"><font color="${
-      prefs.color_black
+    `<td port="${port}" BORDER="${b}" cellpadding="${p}" ${sides} cellspacing="0" bgcolor="${bg}" align="left"><font color="${prefs.colors.black
     }" point-size="9">${label}</font></td>`
 
   const rows = elems.map((el, i) => {
@@ -731,21 +668,16 @@ function gr_vlol_html(
   })
 
   return `<table BORDER="0" CELLPADDING="0" CELLBORDER="0" CELLSPACING="0">
-${
-  title !== null
-    ? `<tr><td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${
-      prefs.color_black
-    }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`
-    : ''
-}
+${title !== null
+      ? `<tr><td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${prefs.colors.black
+      }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`
+      : ''
+    }
 ${rows.join('\n')}
 </table>`
 }
 
-function gr_vlist_html(
-  elems,
-  { title, bgcolor = prefs.color_yellow, showindexes = true, showelems = true } = {}
-) {
+function gr_vlist_html(elems, { title, bgcolor = prefs.colors.yellow, showindexes = true, showelems = true } = {}) {
   if (elems.length === 0) return ' '
 
   const header = '<table BORDER="0" CELLPADDING="0" CELLBORDER="1" CELLSPACING="0">\n'
@@ -755,9 +687,7 @@ function gr_vlist_html(
   const rows = []
 
   if (title) {
-    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${
-      prefs.color_black
-    }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
+    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${prefs.colors.black}" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
   }
 
   const N = elems.length
@@ -775,9 +705,7 @@ function gr_vlist_html(
   if (N > 0) {
     items.forEach(([i, e]) => {
       let v
-      const index = `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="Helvetica" color="${
-        prefs.color_black
-      }" point-size="11">${i} </font></td>\n`
+      const index = `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="Helvetica" color="${prefs.colors.black}" point-size="11">${i} </font></td>\n`
       if (isatom(e)) {
         if (str(e).length > prefs.max_str_len) e = abbrev_and_escape(str(e))
         /* HACK: avoid string quotes for size 2 Sets */
@@ -786,9 +714,7 @@ function gr_vlist_html(
         v = '   '
       }
 
-      const value = `<td port="${i}" cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="center"><font color="${
-        prefs.color_black
-      }" point-size="11"> ${v}</font></td>\n`
+      const value = `<td port="${i}" cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="center"><font color="${prefs.colors.black}" point-size="11"> ${v}</font></td>\n`
       rows.push(showindexes ? `<tr>${index}${sep}${value}</tr>\n` : `<tr>${value}</tr>\n`)
     })
   } else {
@@ -798,74 +724,50 @@ function gr_vlist_html(
   return header + rows.join(blankrow) + tail
 }
 
-function gr_vtree_node(
-  nodename,
-  items,
-  leaf,
-  {
-    title,
-    minimal,
-    bgcolor = prefs.color_yellow,
-    separator = null,
-    leftfield = 'left',
-    rightfield = 'right'
-  } = {}
-) {
-  const html = gr_vtree_html(items, leaf, {
-    title,
-    minimal,
-    bgcolor,
-    separator,
-    leftfield,
-    rightfield
-  })
-  const template = (n, c, fc, bg, l) =>
-    `${n} [margin="0.03", color="${c}", fontcolor="${fc}", fontname="Helvetica", style=filled, fillcolor="${bg}", label=<${l}>];\n`
+function gr_vtree_node(nodename, items, leaf, {
+  title,
+  minimal,
+  bgcolor = prefs.colors.yellow,
+  separator = null,
+  leftfield = 'left',
+  rightfield = 'right'
+} = {}) {
+  const html = gr_vtree_html(items, leaf, { title, minimal, bgcolor, separator, leftfield, rightfield })
+  const template = (n, c, fc, bg, l) => `${n} [margin="0.03", color="${c}", fontcolor="${fc}", fontname="Helvetica", style=filled, fillcolor="${bg}", label=<${l}>];\n`
 
-  return template(nodename, prefs.color_black, prefs.color_black, bgcolor, html)
+  return template(nodename, prefs.colors.black, prefs.colors.black, bgcolor, html)
 }
 
-function gr_vtree_html(
-  items,
-  leaf,
-  {
-    title,
-    minimal,
-    bgcolor = prefs.color_yellow,
-    separator = null,
-    leftfield = 'left',
-    rightfield = 'right'
-  } = {}
-) {
+function gr_vtree_html(items, leaf, {
+  title,
+  minimal,
+  bgcolor = prefs.colors.yellow,
+  separator = null,
+  leftfield = 'left',
+  rightfield = 'right'
+} = {}) {
   const rows = []
   const blankrow = `<tr><td colspan="3" cellpadding="1" border="0" bgcolor="${bgcolor}"></td></tr>`
 
   if (title && !minimal) {
-    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${
-      prefs.color_black
-    }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
+    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="b" align="center"><font color="${prefs.colors.black
+      }" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
   }
 
   if (items.length > 0) {
     items.forEach(([label, key, value]) => {
       const font = 'Helvetica'
 
-      const sep = '<td cellspacing="0" cellpadding="0" border="0"></td>'
+      let sep = '<td cellspacing="0" cellpadding="0" border="0"></td>'
 
-      const name = minimal
-        ? leaf
-          ? ''
-          : `<td port="${label}_label" cellspacing="0" cellpadding="0" border="0" ><font face="${font}" point-size="11">&nbsp;&nbsp;&nbsp; </font></td>\n`
-        : `<td port="${label}_label" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="${font}" color="${
-          prefs.color_black
-        }" point-size="11">${key} </font></td>\n`
+      let name = minimal ? (leaf ? '' : `<td port="${label}_label" cellspacing="0" cellpadding="0" border="0" ><font face="${font}" point-size="11">&nbsp;&nbsp;&nbsp; </font></td>\n`) : `<td port="${label}_label" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="${font}" color="${prefs.colors.black}" point-size="11">${key} </font></td>\n`
 
       // if (separator !== null) {
       //   name = `<td port="${label}_label" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0" align="right"><font face="${font}" color="${
-      //     prefs.color_black
+      //     prefs.colors.black
       //   }" point-size="11">${key} </font></td>\n`
       //   sep = `<td cellpadding="0" border="0" valign="bottom"><font color="${
-      //     prefs.color_black
+      //     prefs.colors.black
       //   }" point-size="9">${separator}</font></td>`
       // }
 
@@ -875,10 +777,7 @@ function gr_vtree_html(
         v = minimal ? v : repr(v)
       }
 
-      value = `<td port="${label}" cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="left"><font color="${
-        prefs.color_black
-      }" point-size="11"> ${v}</font></td>\n`
-
+      value = `<td port="${label}" cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="left"><font color="${prefs.colors.black}" point-size="11"> ${v}</font></td>\n`
       rows.push(`<tr>${name}${sep}${value}</tr>\n`)
     })
   } else {
@@ -888,28 +787,14 @@ function gr_vtree_html(
   let sep = `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0"></td>`
 
   if (separator !== null) {
-    sep = `<td cellpadding="0" bgcolor="${bgcolor}" border="0" valign="bottom"><font color="${
-      prefs.color_black
-    }" point-size="15">${separator}</font></td>`
+    sep = `<td cellpadding="0" bgcolor="${bgcolor}" border="0" valign="bottom"><font color="${prefs.colors.black}" point-size="15">${separator}</font></td>`
   }
 
   /* eslint-disable */
   const kidsep = `<tr><td colspan="3" cellpadding="0" border="1" sides="b" height="3"></td></tr>${blankrow}`
-  const kidnames = `<tr><td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="left"><font color="${
-    prefs.color_black
-  }" point-size="6">${leftfield}</font></td>${sep}<td cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="right"><font color="${
-    prefs.color_black
-  }" point-size="6">${rightfield}</font></td></tr>`
-  const kidptrs = `<tr><td port="${leftfield}" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r"><font color="${
-    prefs.color_black
-  }" point-size="1"> </font></td>${sep}<td port="${rightfield}" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0"><font color="${
-    prefs.color_black
-  }" point-size="1"> </font></td></tr>`
-  const bottomsep = `<tr><td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r"><font color="${
-    prefs.color_black
-  }" point-size="3"> </font></td>${sep}<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0"><font color="${
-    prefs.color_black
-  }" point-size="3"> </font></td></tr>`
+  const kidnames = `<tr><td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="left"><font color="${prefs.colors.black}" point-size="6">${leftfield}</font></td>${sep}<td cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="right"><font color="${prefs.colors.black}" point-size="6">${rightfield}</font></td></tr>`
+  const kidptrs = `<tr><td port="${leftfield}" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r"><font color="${prefs.colors.black}" point-size="1"> </font></td>${sep}<td port="${rightfield}" cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0"><font color="${prefs.colors.black}" point-size="1"> </font></td></tr>`
+  const bottomsep = `<tr><td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r"><font color="${prefs.colors.black}" point-size="3"> </font></td>${sep}<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="0"><font color="${prefs.colors.black}" point-size="3"> </font></td></tr>`
   /* eslint-enable */
 
   const bottom = leaf && minimal ? '' : `${kidsep}${kidnames}${kidptrs}${bottomsep}`
@@ -919,9 +804,7 @@ function gr_vtree_html(
 }
 
 function string_node(s) {
-  return `    ${nodename(s)} [width=0,height=0, color="${prefs.color_black}", fontcolor="${
-    prefs.color_black
-  }", fontname="Helvetica", style=filled, fillcolor="${prefs.color_yellow}", label=<${string_html(s)}>];\n`
+  return `    ${nodename(s)} [width=0,height=0, color="${prefs.colors.black}", fontcolor="${prefs.colors.black}", fontname="Helvetica", style=filled, fillcolor="${prefs.colors.yellow}", label=<${string_html(s)}>];\n`
 }
 
 function string_html(s) {
@@ -929,13 +812,10 @@ function string_html(s) {
 
   /* don't want right border to show on last. */
   const index_html = (d, last) =>
-    `<td cellspacing="0" cellpadding="0" bgcolor="${prefs.color_yellow}" border="1" sides="b${
-      last ? '' : 'r'
-    }" valign="top"><font color="${prefs.color_black}" point-size="9">${d}</font></td>\n`
+    `<td cellspacing="0" cellpadding="0" bgcolor="#FBFEB0" border="1" sides="b${last ? '' : 'r'
+    }" valign="top"><font color="${prefs.colors.black}" point-size="9">${d}</font></td>\n`
   const value_html = (d, s, last) =>
-    `<td port="${d}" cellspacing="0" cellpadding="0" bgcolor="${
-      prefs.color_yellow
-    }" border="0" align="center"><font face="Monaco" point-size="11">${s}</font></td>\n`
+    `<td port="${d}" cellspacing="0" cellpadding="0" bgcolor="#FBFEB0" border="0" align="center"><font face="Monaco" point-size="11">${s}</font></td>\n`
 
   const toprow = values.map((v, i) => index_html(i, i === values.length - 1))
   const bottomrow = values.map((v, i) => value_html(i, v, i === values.length - 1))
@@ -1106,7 +986,7 @@ function connected_subgraphs(reachable, varnames = null) {
       const q = e[2]
 
       if (ctor(p) === ctor(q)) {
-        /* Ensure that singly-linked nodes use same field */
+        /* ensure that singly-linked nodes use same field */
         // const cname = ctor(p)
 
         // if (max_edges_for_type[cname] === 1 && cname in type_fieldname_map) {
