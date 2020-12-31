@@ -138,6 +138,9 @@
       import { examples } from './src/examples.js';
 
       let digraph
+      const whites = { black: '#444443', yellow: '#ffffff', blue: '#ffffff', green: '#ffffff' }
+      const colors = { black: '#444443', yellow: '#fefecd', blue: '#d9e6f5', green: '#cfe2d4' }
+
       const viz = new Viz({ workerURL: "./assets/lib/viz.js/full.render.js" });
       const editor = ace.edit("editor");
       const JavaScriptMode = ace.require("ace/mode/javascript").Mode;
@@ -159,9 +162,7 @@
         hideErrors()
 
         config('penwidth', flame.checked ? 0.9 : 0.5);
-        config('color_yellow', paintcan.checked ? '#fefecd' : '#ffffff');
-        config('color_blue', paintcan.checked ? '#d9e6f5' : '#ffffff');
-        config('color_green', paintcan.checked ? '#cfe2d4' : '#ffffff');
+        config('colors', paintcan.checked ?  colors : whites)
 
         const codeString = editor.getValue();
 
