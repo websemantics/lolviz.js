@@ -33,7 +33,7 @@ const defaultStyle = {
  * the first 'polygon' node with two 'rect' nodes, a rounded rectangle border and shadow.
  *
  * 3- Iterates over edges/arrows ('g' elements with class attribute = 'node') and set fill
- * color of the edge haed and tail.
+ * color of the edge head and tail.
  *
  * @param {Element} el - DOM Node
  */

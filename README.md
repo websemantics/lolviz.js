@@ -30,13 +30,13 @@ Also, here's a quick reminder of few Python collections (arrays) that have been 
 
 ## Appearance
 
-There was an attempt in this project to make few style changes to graphviz generated SVG images in order to enhance their apperance.
+There was an attempt in this project to make few style changes to graphviz generated SVG images in order to enhance their appearance.
 
 Here's an example of the three styles that can be displayed (fancy, b&w and classic),
 
 <img src="assets/img/appearance.png" width=850>
 
-This was achieved by making few tweaks to the original code to accumodate run-time changes to color and style (line thickness for example) in addition to making direct changes to the SVG DOM of the generated images.
+This was achieved by making few tweaks to the original code to accommodate run-time changes to color and style (line thickness for example) in addition to making direct changes to the SVG DOM of the generated images.
 
 Also, check out [this reference page](https://websemantics.github.io/lolviz.js/assets/demo/graphviz.html) for more examples of how to write/tweak graphviz dot graphs.
 
@@ -86,11 +86,11 @@ Approximal implementations of some of [Python built-in functions](https://docs.p
 
 #### Type.js
 
-A tiny libary to work with Javascript types including a built-in support for ducktyping.
+A tiny libary to work with Javascript types including a built-in support for duck-typing.
 
 * `type` : Return variable type as a string
 * `is`   : Check for a variable type
-* `as`   : Check for a variable ducktype
+* `as`   : Check for a variable duck-type
 * `ctor` : Get a variable class name
 
 #### Reflect.js
