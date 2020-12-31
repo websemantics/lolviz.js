@@ -42,11 +42,16 @@ Also, check out [this reference page](https://websemantics.github.io/lolviz.js/a
 
 ## New Features
 
-Addmitedly, what comes next is not exactly inline with the initial premise of the lolviz library but they were included in this project regadless because, 1. They can be useful tools, 2. They produce cool visualizations, and 3. why not?
+Admittedly, what comes next is not exactly inline with the initial premise of the lolviz library but they were included in this project regardless because, 1. They can be useful tools, 2. They produce cool visualizations, and 3. why not?
+
+#### New functions
+
+- clusterviz: displays a top-down visualization of a cluster of graph objects.
+- graphviz: Displays a top-down visualization of a graph object.
 
 #### Tensors
 
-This feature visualizes Tensors with different sizes/ranks like scalars, vectors, matrices or any rank `n` tensors (up to rank 3 for the timebeing).
+This feature visualizes Tensors with different sizes/ranks like scalars, vectors, matrices or any rank `n` tensors (up to rank 3 for the time being).
 
 <img src="assets/img/tensor.png" width=850>
 

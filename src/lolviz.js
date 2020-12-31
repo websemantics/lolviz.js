@@ -144,6 +144,77 @@ export function listviz(elems, { showassoc = true, shape = [], showindexes = !sh
 }
 
 /**
+ * Display a top-down visualization of a cluster of graph objects.
+ *
+ * @created 7 Dec 2019
+ * @param {Object} c - Cluster to visualize.
+ */
+export function clusterviz(c, { orientation = 'TB', vertical = 0.1, horizontal = 0.3, label, title, minimal } = {}) {
+  const g_attrs = { nodesep: vertical, ranksep: horizontal, penwidth: '.7', pencolor: `"${prefs.color_green}"`, rankdir: orientation, fontname: 'Helvetica', fontcolor: `"${prefs.color_black}"`, fontsize: 8 }
+  const cluster_links = []
+
+  const body = Array.from(c.graphs).map(([id, g]) => {
+    const { nodes, links } = graph_parts(g, { title, minimal })
+
+    cluster_links.push(...links)
+
+    return digraph(`${nodes.join('\n  ')}`, { ...g_attrs, label: `"${g.label || id}"` }, 'subgraph', `cluster_${id}`)
+  })
+
+  return digraph(`${body.join('\n')}${cluster_links.join('\n')}`, g_attrs)
+}
+
+/**
+ * Display a top-down visualization of a graph object.
+ *
+ * @created 7 Dec 2019
+ * @param {Object} g - Graph to visualize.
+ * @param {string} [orientation='LR'] - Layout orientation.
+ */
+export function graphviz(g, { orientation = 'TB', vertical = 0.1, horizontal = 0.3, label, title, minimal } = {}) {
+  const g_attrs = { nodesep: vertical, ranksep: horizontal, penwidth: '.7', pencolor: `"${prefs.color_green}"`, rankdir: orientation, fontname: 'Helvetica', fontcolor: `"${prefs.color_black}"`, fontsize: 8 }
+  if (label) g_attrs.label = `"${label}"`
+
+  const { nodes, links } = graph_parts(g, { title, minimal })
+
+  return digraph(`${links.join('\n  ')} ${nodes.join('\n  ')}`, g_attrs )
+}
+
+function graph_parts(g, { title = n => ctor(n), minimal = false }) {
+  /* Clone nodes and remove adjacent array */
+  const gnodes = Array.from(g.nodes.values()).map(n => n.clone()).map(n => delete n.adjacent && n)
+  const links = g.edges.map(([from, to]) => `"${from.id}" -> "${to.id}" ${prefs.arrow_style};`)
+  const nodes = gnodes.map(n => `    "${n.id}" [width=0,height=0, color="${prefs.color_black}", fontcolor="${prefs.color_black}", fontname="Helvetica", style=filled, fillcolor="${prefs.color_yellow}", label=<${graph_node_html(n, { minimal, title: title(n) })}>];\n`)
+
+  return { nodes, links }
+}
+
+function graph_node_html(n, { title, minimal, bgcolor = prefs.color_yellow } = {}) {
+  const rows = []
+  const blankrow = `<tr><td colspan="3" cellpadding="1" border="0" bgcolor="${bgcolor}"></td></tr>`
+
+  if (title) {
+    rows.push(`<tr><td cellspacing="0" colspan="3" cellpadding="0" bgcolor="${bgcolor}" border="${minimal ? 0 : 1}" sides="b" align="center"><font color="${prefs.color_black}" FACE="Times-Italic" point-size="11">${title}</font></td></tr>\n`)
+  }
+
+  if (!minimal) {
+    Object.entries(n).forEach(([key, value]) => {
+      let sep = '<td cellspacing="0" cellpadding="0" border="0"></td>'
+      let name = `<td cellspacing="0" cellpadding="0" bgcolor="${bgcolor}" border="1" sides="r" align="right"><font face="Helvetica" color="${prefs.color_black}" point-size="11">${key} </font></td>\n`
+
+      const v = value !== null ? repr(abbrev_and_escape(str(value))) : '   '
+
+      value = `<td  cellspacing="0" cellpadding="1" bgcolor="${bgcolor}" border="0" align="left"><font color="${prefs.color_black}" point-size="11">  ${v}</font></td>\n`
+      rows.push(`<tr>${name}${sep}${value}</tr>\n`)
+    })
+  }
+
+  return `<table BORDER="0" CELLPADDING="0" CELLBORDER="1" CELLSPACING="0">
+  ${rows.join(blankrow)}
+  </table>`
+}
+
+/**
  * Display a top-down visualization of a binary tree that has two fields
  * pointing at the left and right subtrees. The type of each node is
  * displayed, all fields, and then left/right pointers at the bottom.
