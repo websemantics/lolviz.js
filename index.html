@@ -47,7 +47,7 @@
     import { ord, chr, array, range, len } from './src/support/python.js'
     import { config, listviz, lolviz, objviz, strviz, treeviz, callviz, classviz } from './src/lolviz.js';
     import Viz from './assets/lib/viz.js/viz.es.js';
-    import { fancy } from './src/support/fancy.js';
+    import { stylizer } from './src/support/stylizer.js';
     import { examples } from './src/examples.js';
     import { highlight } from './src/support/highlight.js';
 
@@ -80,7 +80,7 @@
         pre.innerHTML = highlight(example.code)
         pre.setAttribute('class', 'highlight')
 
-        const render = (g) => viz.renderSVGElement(g).then(el => digraph.appendChild(flame.checked ? fancy(el) : el))
+        const render = (g) => viz.renderSVGElement(g).then(el => digraph.appendChild(flame.checked ? stylizer(el) : el))
 
         eval(example.code)
       })

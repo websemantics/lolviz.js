@@ -134,7 +134,7 @@
       import { ord, chr, array, range, len } from "./src/support/python.js"
       import { config, listviz, lolviz, objviz, strviz, treeviz, callviz, classviz } from "./src/lolviz.js";
       import Viz from "./assets/lib/viz.js/viz.es.js";
-      import { fancy } from "./src/support/fancy.js";
+      import { stylizer } from "./src/support/stylizer.js";
       import { examples } from './src/examples.js';
 
       let digraph
@@ -167,9 +167,9 @@
 
         const render = (g) => viz.renderSVGElement(g).then(el => {
           if (digraph.firstChild) {
-            digraph.replaceChild(flame.checked ? fancy(el) : el, digraph.firstChild);
+            digraph.replaceChild(flame.checked ? stylizer(el) : el, digraph.firstChild);
           } else {
-            digraph.appendChild(flame.checked ? fancy(el) : el);
+            digraph.appendChild(flame.checked ? stylizer(el) : el);
           }
         })
 
