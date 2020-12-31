@@ -58,6 +58,7 @@ const entities = {
   "'": '#39'
 }
 
+export { type, ctor }
 export const id = k => (map.has(k) ? map.get(k) : map.set(k, `${count++}`).get(k))
 export const escape = v => v.replace(/[<>&]/g, m => `&${entities[m]};`)
 export const stringify = v => escape(JSON.stringify(v).replace(/"/g, "'")).replace(/,/g, ', ')

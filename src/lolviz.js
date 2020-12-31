@@ -8,14 +8,13 @@
  * @license Distributed under the terms of the MIT License.
  */
 
-import { id, len, escape, repr, str, hasattr, list, chunk } from './support/python.js'
-import { type, ctor } from './support/type.js'
+import { id, type, ctor, len, escape, repr, str, hasattr, list, chunk } from './support/python.js'
 import { reflect } from './support/reflect.js'
 
 /**
  * Preferences.
  */
-const prefs = {
+export const prefs = {
   /* style properties */
   penwidth: 0.5,
   color_black: '#444443',
